@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "477300849470",
+    "firebase_url": "https://food-diary-f9bc2-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "food-diary-f9bc2",
+    "storage_bucket": "food-diary-f9bc2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:477300849470:android:7b5accded364cc55334a6f",
+        "android_client_info": {
+          "package_name": "com.example.maitinimosidienorastis"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDRKET9n0MfY-Cl_vNtK8ChovSOIojSFdQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
