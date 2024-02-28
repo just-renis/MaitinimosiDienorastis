@@ -3,10 +3,8 @@ package com.example.maitinimosidienorastis;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
@@ -26,9 +24,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.database.annotations.Nullable;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class AddProductActivity extends AppCompatActivity {
@@ -72,7 +68,7 @@ public class AddProductActivity extends AppCompatActivity {
         OnBackPressedCallback callback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                Intent intent = new Intent(getApplicationContext(), MyProductsActivity.class);
+                Intent intent = new Intent(AddProductActivity.this, MyProductsActivity.class);
                 startActivity(intent);
                 finish();
             }
@@ -80,46 +76,27 @@ public class AddProductActivity extends AppCompatActivity {
         getOnBackPressedDispatcher().addCallback(this, callback);
     }
     private void addProductToDB(FirebaseUser currentUser) {
-        DatabaseReference countRef = FirebaseDatabase.getInstance().getReference("users").child(currentUser.getUid()).child("productsCount");
-        countRef.runTransaction(new Transaction.Handler() {
-            @NonNull
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("users").child(currentUser.getUid()).child("products");
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public Transaction.Result doTransaction(@NonNull MutableData mutableData) {
-                Integer count = mutableData.getValue(Integer.class);
-                if (count == null) mutableData.setValue(1);
-                else mutableData.setValue(count + 1);
-                return Transaction.success(mutableData);
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Map<String, String> fieldValues = editFieldsMap.entrySet().stream()
+                        .collect(Collectors.toMap(
+                                Map.Entry::getKey,
+                                entry -> {
+                                    String value = entry.getValue().getText().toString();
+                                    return value.trim().isEmpty() ? "No Data" : value;
+                                }
+                        ));
+                Product product = new Product(fieldValues);
+                ref.push().setValue(product);
+                Toast.makeText(AddProductActivity.this, "Produktas sėkmingai pridėtas", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getApplicationContext(), MyProductsActivity.class);
+                startActivity(intent);
+                finish();
             }
             @Override
-            public void onComplete(@Nullable DatabaseError error, boolean committed, @Nullable DataSnapshot currentData) {
-                countRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        productsCount = snapshot.getValue(Integer.class);
-                        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("users").child(currentUser.getUid()).child("products");
-                        ref.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                Map<String, String> fieldValues = editFieldsMap.entrySet().stream()
-                                        .collect(Collectors.toMap(
-                                                Map.Entry::getKey,
-                                                entry -> entry.getValue().getText().toString()
-                                        ));
-                                Product product = new Product(fieldValues);
-                                ref.push().setValue(product);
-                                Toast.makeText(AddProductActivity.this, "Produktas sėkmingai pridėtas", Toast.LENGTH_SHORT).show();
-                                Intent intent = new Intent(getApplicationContext(), MyProductsActivity.class);
-                                startActivity(intent);
-                                finish();
-                            }
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) { }
-                        });
-                    }
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) { }
-                });
-            }
+            public void onCancelled(DatabaseError databaseError) { }
         });
     }
 }

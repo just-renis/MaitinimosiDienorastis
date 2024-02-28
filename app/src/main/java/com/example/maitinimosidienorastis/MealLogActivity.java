@@ -1,25 +1,19 @@
 package com.example.maitinimosidienorastis;
 
-import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -70,7 +64,6 @@ public class MealLogActivity extends AppCompatActivity implements ProductViewLis
         setupDateButton();
         setupTimeButton();
         setupProductsButton();
-        setupOnBackButtonClicked();
         setupInsertButton();
     }
     private void setupDateButton() {
@@ -164,17 +157,6 @@ public class MealLogActivity extends AppCompatActivity implements ProductViewLis
             }
         });
     }
-    private void setupOnBackButtonClicked() {
-        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                startActivity(intent);
-                finish();
-            }
-        };
-        getOnBackPressedDispatcher().addCallback(this, callback);
-    }
     @Override
     public void onItemClick(Product product) {
         savedProducts.add(product);
@@ -238,8 +220,6 @@ public class MealLogActivity extends AppCompatActivity implements ProductViewLis
                                 timeText.getText().toString().replace("Pasirinktas laikas: ", ""), savedProductsKeys);
                             ref.push().setValue(mealTimeStamp);
                             Toast.makeText(MealLogActivity.this, "Išsaugota", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                            startActivity(intent);
                             finish();
                         }
                         @Override

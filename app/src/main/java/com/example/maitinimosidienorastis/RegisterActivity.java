@@ -17,7 +17,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -30,9 +29,8 @@ public class RegisterActivity extends AppCompatActivity {
     public void onStart() {
         super.onStart();
         if(auth.getCurrentUser() != null){
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
             startActivity(intent);
-            finish();
         }
     }
     @Override
@@ -81,9 +79,8 @@ public class RegisterActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             Toast.makeText(RegisterActivity.this, "Paskyra sukurta",
                                     Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                            Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
                             startActivity(intent);
-                            finish();
                         } else {
                             Toast.makeText(RegisterActivity.this, "Nepavyko sukurti paskyros",
                                     Toast.LENGTH_SHORT).show();
@@ -95,9 +92,8 @@ public class RegisterActivity extends AppCompatActivity {
         clickToLoginText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
                 startActivity(intent);
-                finish();
             }
         });
     }

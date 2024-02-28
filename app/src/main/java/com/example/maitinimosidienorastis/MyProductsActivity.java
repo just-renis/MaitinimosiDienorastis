@@ -1,6 +1,5 @@
 package com.example.maitinimosidienorastis;
 
-import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -40,21 +39,19 @@ public class MyProductsActivity extends AppCompatActivity {
         goToAddProductButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), AddProductActivity.class);
+                Intent intent = new Intent(MyProductsActivity.this, AddProductActivity.class);
                 startActivity(intent);
-                finish();
             }
         });
         getData();
-        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+       /* OnBackPressedCallback callback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                Intent intent = new Intent(MyProductsActivity.this, MainActivity.class);
                 startActivity(intent);
-                finish();
             }
         };
-        getOnBackPressedDispatcher().addCallback(this, callback);
+        getOnBackPressedDispatcher().addCallback(this, callback);*/
     }
     private void getData() {
         DatabaseReference userProductsRef = FirebaseDatabase.getInstance().getReference("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("products");

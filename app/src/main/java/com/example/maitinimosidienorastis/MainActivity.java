@@ -1,5 +1,6 @@
 package com.example.maitinimosidienorastis;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -31,50 +32,50 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         setContentView(R.layout.activity_main);
         auth = FirebaseAuth.getInstance();
         logOutButton = findViewById(R.id.logOutButton);
         goToMyProductsButton = findViewById(R.id.goToMyProducts);
         goToMealLogButton = findViewById(R.id.goToMealLogButton);
         goToMealLogDataButton = findViewById(R.id.goToMealLogDataButton);
-        if (auth.getCurrentUser() == null){
-            Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+        if (auth.getCurrentUser() == null) {
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
             startActivity(intent);
-            finish();
         }
         logOutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 FirebaseAuth.getInstance().signOut();
-                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                startActivity(intent);
                 finish();
             }
         });
         goToMyProductsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), MyProductsActivity.class);
+                Intent intent = new Intent(MainActivity.this, MyProductsActivity.class);
                 startActivity(intent);
-                finish();
             }
         });
         goToMealLogButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), MealLogActivity.class);
+                Intent intent = new Intent(MainActivity.this, MealLogActivity.class);
                 startActivity(intent);
-                finish();
             }
         });
         goToMealLogDataButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), MealLogDataActivity.class);
+                Intent intent = new Intent(MainActivity.this, MealLogDataActivity.class);
                 startActivity(intent);
-                finish();
             }
         });
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() { }
+        };
+        getOnBackPressedDispatcher().addCallback(this, callback);
     }
 
     @Override
@@ -93,22 +94,23 @@ public class MainActivity extends AppCompatActivity {
             List<String> keys = new ArrayList<>();
             for (Cell cell : firstRow) keys.add(cell.getStringCellValue());
             DatabaseReference db = FirebaseDatabase.getInstance().getReference().child("products");
-            int index = 0;
             while (rowIterator.hasNext()) {
                 Row row = rowIterator.next();
                 Map<String, Object> product = new HashMap<>();
                 int cellIndex = 0;
                 for (Cell cell : row) {
-                    String value;
-                    if (cell.getCellType() == CellType.NUMERIC) {
-                        double numericValue = cell.getNumericCellValue();
-                        if (numericValue == Math.floor(numericValue)) value = String.valueOf((int) numericValue);
-                        else value = String.valueOf(numericValue);
+                    String value = "";
+                    if (cell != null) {
+                        if (cell.getCellType() == CellType.NUMERIC) {
+                            double numericValue = cell.getNumericCellValue();
+                            if (numericValue == Math.floor(numericValue)) value = String.valueOf((int) numericValue);
+                            else value = String.valueOf(numericValue);
+                        }
+                        else value = cell.getStringCellValue();
                     }
-                    else value = cell.getStringCellValue();
+                    if (value.trim().isEmpty()) value = "No Data";
                     product.put(keys.get(cellIndex++), value);
                 }
-                product.put("Id", ++index);
                 db.push().setValue(product);
             }
             inputStream.close();

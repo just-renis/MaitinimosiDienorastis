@@ -30,9 +30,8 @@ public class LoginActivity extends AppCompatActivity {
     public void onStart() {
         super.onStart();
         if(auth.getCurrentUser() != null){
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
             startActivity(intent);
-            finish();
         }
     }
     @Override
@@ -48,7 +47,6 @@ public class LoginActivity extends AppCompatActivity {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                loginProgressBar.setVisibility(View.VISIBLE);
                 String email = String.valueOf(editTextEmail.getText());
                 String password = String.valueOf(editTextPassword.getText());
                 if (TextUtils.isEmpty(email)) {
@@ -59,6 +57,7 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(LoginActivity.this, "Įrašykite slaptažodį", Toast.LENGTH_SHORT).show();
                     return;
                 }
+                loginProgressBar.setVisibility(View.VISIBLE);
                 auth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
@@ -66,9 +65,8 @@ public class LoginActivity extends AppCompatActivity {
                         loginProgressBar.setVisibility(View.GONE);
                         if (task.isSuccessful()) {
                             Toast.makeText(LoginActivity.this, "Sveiki!", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                             startActivity(intent);
-                            finish();
                         }
                         else Toast.makeText(LoginActivity.this, "Nepavyko prisijungti prie paskyros", Toast.LENGTH_SHORT).show();
                     }
@@ -78,9 +76,8 @@ public class LoginActivity extends AppCompatActivity {
         clickToRegisterText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), RegisterActivity.class);
+                Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
                 startActivity(intent);
-                finish();
             }
         });
     }

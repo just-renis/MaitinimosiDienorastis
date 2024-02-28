@@ -3,14 +3,11 @@ package com.example.maitinimosidienorastis;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
@@ -42,7 +39,7 @@ public class UpdateProductActivity extends AppCompatActivity {
                     for (DataSnapshot productSnapshot : dataSnapshot.getChildren()) {
                         Map<String, String> fieldValues = (Map<String, String>) productSnapshot.getValue();
                         for (Map.Entry<String, String> entry : fieldValues.entrySet()) {
-                            editFieldsMap.get(entry.getKey()).setText(entry.getValue());
+                            editFieldsMap.get(entry.getKey()).setText(entry.getValue().equals("No Data") ? "" : entry.getValue());
                         }
                     }
                 }
@@ -56,17 +53,15 @@ public class UpdateProductActivity extends AppCompatActivity {
                 Map<String, Object> updateMap = new HashMap<>();
                 for (Map.Entry<String, TextInputEditText> entry : editFieldsMap.entrySet()) {
                     TextInputEditText editText = entry.getValue();
-                    updateMap.put(entry.getKey(), editText.getText().toString());
+                    updateMap.put(entry.getKey(), editText.getText().toString().trim().equals("") ? "No Data" : editText.getText().toString().trim());
                 }
                 productsRef.child(getIntent().getStringExtra("PRODUCT_KEY")).updateChildren(updateMap)
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
-                            Toast.makeText(UpdateProductActivity.this, "Product updated successfully", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(UpdateProductActivity.this, "Produktas atnaujintas sėkmingai", Toast.LENGTH_SHORT).show();
                         }
                     });
-                Intent intent = new Intent(getApplicationContext(), MyProductsActivity.class);
-                startActivity(intent);
                 finish();
             }
         });
