@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -27,9 +28,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MealLogActivity extends AppCompatActivity implements ProductViewListener{
 
@@ -196,10 +200,15 @@ public class MealLogActivity extends AppCompatActivity implements ProductViewLis
             ref.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    ArrayList<String> savedProductsKeys = new ArrayList<>();
-                    for (int i = 0; i < savedProducts.size(); i++) savedProductsKeys.add(savedProducts.get(i).getKey());
+                    ArrayList<String> personalProductsKeys = new ArrayList<>();
+                    ArrayList<String> localProductsKeys = new ArrayList<>();
+                    for (int i = 0; i < savedProducts.size(); i++)
+                    {
+                        if (savedProducts.get(i).getIsMineNeededToShow()) personalProductsKeys.add(savedProducts.get(i).getKey());
+                        else localProductsKeys.add(savedProducts.get(i).getKey());
+                    }
                     MealTimeStamp mealTimeStamp = new MealTimeStamp(dateText.getText().toString().replace("Pasirinkta data: ", ""),
-                            timeText.getText().toString().replace("Pasirinktas laikas: ", ""), savedProductsKeys);
+                            timeText.getText().toString().replace("Pasirinktas laikas: ", ""), personalProductsKeys, localProductsKeys);
                     ref.push().setValue(mealTimeStamp);
                     Toast.makeText(MealLogActivity.this, "Išsaugota", Toast.LENGTH_SHORT).show();
                     finish();
@@ -215,7 +224,7 @@ public class MealLogActivity extends AppCompatActivity implements ProductViewLis
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot productSnapshot: dataSnapshot.getChildren()) {
-                    allProducts.add(new Product(productSnapshot.child("name").getValue(String.class), "", true));
+                    allProducts.add(new Product(productSnapshot.child("name").getValue(String.class), productSnapshot.getKey(), true));
                 }
             }
             @Override
@@ -228,7 +237,7 @@ public class MealLogActivity extends AppCompatActivity implements ProductViewLis
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot productSnapshot: dataSnapshot.getChildren()) {
-                    allProducts.add(new Product(productSnapshot.child("Lithuanian name").getValue(String.class), "", false));
+                    allProducts.add(new Product(productSnapshot.child("Lithuanian name").getValue(String.class), productSnapshot.getKey(), false));
                 }
                 isProductDataFetched = true;
                 productsProgressBar.setVisibility(View.GONE);

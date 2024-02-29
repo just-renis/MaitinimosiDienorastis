@@ -27,4 +27,15 @@
         app:layout_constraintTop_toBottomOf="@+id/mealLogDataTitle"
         app:layout_constraintVertical_bias="0.0"/>
 
+    <TextView
+        android:id="@+id/noMealLogsText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:text="Neturite jokių mitybos veiklų"
+        app:layout_constraintTop_toBottomOf="@+id/mealLogDataTitle" />
 </androidx.constraintlayout.widget.ConstraintLayout>

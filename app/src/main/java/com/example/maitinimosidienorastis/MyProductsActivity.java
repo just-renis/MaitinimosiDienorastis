@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
@@ -26,6 +27,7 @@ public class MyProductsActivity extends AppCompatActivity {
     private RecyclerView productsListView;
     private ProductAdapter adapter;
     private List<Product> productList;
+    private TextView noProductsText;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,7 +35,8 @@ public class MyProductsActivity extends AppCompatActivity {
         goToAddProductButton = findViewById(R.id.goToAddProductActivity);
         productsListView = findViewById(R.id.productsListView);
         productList = new ArrayList<>();
-        adapter = new ProductAdapter(productList);
+        adapter = new ProductAdapter(productList);;
+        noProductsText = findViewById(R.id.noProductsText);
         productsListView.setAdapter(adapter);
         productsListView.setLayoutManager(new LinearLayoutManager(this));
         goToAddProductButton.setOnClickListener(new View.OnClickListener() {
@@ -46,19 +49,29 @@ public class MyProductsActivity extends AppCompatActivity {
         getMyProducts();
     }
     private void getMyProducts() {
-        DatabaseReference userProductsRef = FirebaseDatabase.getInstance().getReference("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("products");
-        userProductsRef.addValueEventListener(new ValueEventListener() {
+        loadMyProducts(new ProductsLoadedCallback() {
+            @Override
+            public void onCallBack() {
+                if (!productList.isEmpty()) noProductsText.setVisibility(View.GONE);
+                else noProductsText.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+    private void loadMyProducts(ProductsLoadedCallback callback) {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("products");
+        ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 productList.clear();
                 for (DataSnapshot productSnapshot : dataSnapshot.getChildren()) {
-                    productList.add(new Product(productSnapshot.child("name").getValue(String.class), productSnapshot.getKey(), false ));
+                    productList.add(new Product(productSnapshot.child("name").getValue(String.class), productSnapshot.getKey(), false));
                 }
                 adapter.setShowcaseProductsList();
                 adapter.notifyDataSetChanged();
+                callback.onCallBack();
             }
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) { }
+            public void onCancelled(@NonNull DatabaseError databaseError) { callback.onCallBack(); }
         });
     }
 }

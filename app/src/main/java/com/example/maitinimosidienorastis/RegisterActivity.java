@@ -27,14 +27,6 @@ public class RegisterActivity extends AppCompatActivity {
     private ProgressBar registerProgressBar;
     private TextView clickToLoginText;
     @Override
-    public void onStart() {
-        super.onStart();
-        if(auth.getCurrentUser() != null){
-            Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
-            startActivity(intent);
-        }
-    }
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
