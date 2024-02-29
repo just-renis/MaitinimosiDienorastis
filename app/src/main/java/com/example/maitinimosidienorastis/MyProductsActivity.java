@@ -43,26 +43,16 @@ public class MyProductsActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        getData();
-       /* OnBackPressedCallback callback = new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                Intent intent = new Intent(MyProductsActivity.this, MainActivity.class);
-                startActivity(intent);
-            }
-        };
-        getOnBackPressedDispatcher().addCallback(this, callback);*/
+        getMyProducts();
     }
-    private void getData() {
+    private void getMyProducts() {
         DatabaseReference userProductsRef = FirebaseDatabase.getInstance().getReference("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("products");
         userProductsRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 productList.clear();
                 for (DataSnapshot productSnapshot : dataSnapshot.getChildren()) {
-                    productList.add(new Product(productSnapshot.child("name").getValue(String.class),
-                            productSnapshot.getKey()
-                    ));
+                    productList.add(new Product(productSnapshot.child("name").getValue(String.class), productSnapshot.getKey(), false ));
                 }
                 adapter.setShowcaseProductsList();
                 adapter.notifyDataSetChanged();

@@ -27,7 +27,7 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity {
 
     private FirebaseAuth auth;
-    private Button logOutButton, goToMyProductsButton, goToMealLogButton, goToMealLogDataButton;
+    private Button logOutButton, goToMyProductsButton, goToAddMealLogButton, goToInspectMealLogDataButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,45 +37,17 @@ public class MainActivity extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         logOutButton = findViewById(R.id.logOutButton);
         goToMyProductsButton = findViewById(R.id.goToMyProducts);
-        goToMealLogButton = findViewById(R.id.goToMealLogButton);
-        goToMealLogDataButton = findViewById(R.id.goToMealLogDataButton);
+        goToAddMealLogButton = findViewById(R.id.goToAddMealLogButton);
+        goToInspectMealLogDataButton = findViewById(R.id.goToInspectMealLogDataButton);
         if (auth.getCurrentUser() == null) {
             Intent intent = new Intent(MainActivity.this, LoginActivity.class);
             startActivity(intent);
         }
-        logOutButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                FirebaseAuth.getInstance().signOut();
-                finish();
-            }
-        });
-        goToMyProductsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, MyProductsActivity.class);
-                startActivity(intent);
-            }
-        });
-        goToMealLogButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, MealLogActivity.class);
-                startActivity(intent);
-            }
-        });
-        goToMealLogDataButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, MealLogDataActivity.class);
-                startActivity(intent);
-            }
-        });
-        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() { }
-        };
-        getOnBackPressedDispatcher().addCallback(this, callback);
+        setupLogOutButton();
+        setupGoToMyProductsButton();
+        setupGoToAddMealLogButton();
+        setupGoToMealLogDataButton();
+        setupOnBackPressedCallback();
     }
 
     @Override
@@ -83,8 +55,50 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1) recreate();
     }
-
-    public void readExcelAndWriteToDB(Context context, String fileName) {
+    private void setupOnBackPressedCallback() {
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() { }
+        };
+        getOnBackPressedDispatcher().addCallback(this, callback);
+    }
+    private void setupLogOutButton() {
+        logOutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FirebaseAuth.getInstance().signOut();
+                finish();
+            }
+        });
+    }
+    private void setupGoToMyProductsButton() {
+        goToMyProductsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, MyProductsActivity.class);
+                startActivity(intent);
+            }
+        });
+    }
+    private void setupGoToAddMealLogButton() {
+        goToAddMealLogButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, MealLogActivity.class);
+                startActivity(intent);
+            }
+        });
+    }
+    private void setupGoToMealLogDataButton() {
+        goToInspectMealLogDataButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, MealLogDataActivity.class);
+                startActivity(intent);
+            }
+        });
+    }
+    private void readExcelAndWriteToDB(Context context, String fileName) {
         try {
             InputStream inputStream = context.getAssets().open(fileName);
             Workbook workbook = new XSSFWorkbook(inputStream);

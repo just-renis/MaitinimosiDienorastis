@@ -31,14 +31,14 @@
     <string name="potassium">Kalio kiekis</string>
     <string name="calcium">Kalcio kiekis</string>
     <string name="iron">Geležis %</string>
-    <string name="zinc">Cinkas %</string>
+    <string name="zinc">Zinkas %</string>
     <string name="selenium">Seleno kiekis</string>
     <string name="iodide">Jodo kiekis</string>
     <string name="vitaminA_RE">Vitamino A kiekis</string>
     <string name="vitaminD">Vitamino D kiekis</string>
     <string name="vitaminE_TE">Vitamino E kiekis</string>
-    <string name="thiamin">Tiamino kiekis</string>
-    <string name="riboflavin">Riboflavino kiekis</string>
+    <string name="thiamin">Vitamino B1 kiekis</string>
+    <string name="riboflavin">Vitamino B2 kiekis</string>
     <string name="niacin">Niacino kiekis</string>
     <string name="niacinEquivalent">Niacino ekvivalento kiekis</string>
     <string name="folicAcid">Folio rūgšties kiekis</string>

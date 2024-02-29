@@ -125,32 +125,8 @@ public class MealLogActivity extends AppCompatActivity implements ProductViewLis
                     FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
                     if (currentUser != null) {
                         productsProgressBar.setVisibility(View.VISIBLE);
-                        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("users").child(currentUser.getUid()).child("products");
-                        ref.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                for (DataSnapshot productSnapshot: dataSnapshot.getChildren()) {
-                                    allProducts.add(new Product(productSnapshot.child("name").getValue(String.class), ""));
-                                }
-                            }
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) { }
-                        });
-                        ref = FirebaseDatabase.getInstance().getReference("products");
-                        ref.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                for (DataSnapshot productSnapshot: dataSnapshot.getChildren()) {
-                                    allProducts.add(new Product(productSnapshot.child("Lithuanian name").getValue(String.class), ""));
-                                }
-                                isProductDataFetched = true;
-                                productsProgressBar.setVisibility(View.GONE);
-                                if (productAdapter == null) setupProductAdapter();
-                                else productAdapter.notifyDataSetChanged();
-                            }
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) { }
-                        });
+                        receiveUserProducts(currentUser);
+                        receiveLocalProducts();
                     }
                 }
                 else setVisibility(isShowingProducts);
@@ -208,25 +184,59 @@ public class MealLogActivity extends AppCompatActivity implements ProductViewLis
                     Toast.makeText(MealLogActivity.this, "Pasirinkite nors vieną produktą", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-                if (currentUser != null) {
-                    DatabaseReference ref = FirebaseDatabase.getInstance().getReference("users").child(currentUser.getUid()).child("mealTimeStamps");
-                    ref.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            ArrayList<String> savedProductsKeys = new ArrayList<>();
-                            for (int i = 0; i < savedProducts.size(); i++) savedProductsKeys.add(savedProducts.get(i).getKey());
-                            MealTimeStamp mealTimeStamp = new MealTimeStamp(dateText.getText().toString().replace("Pasirinkta data: ", ""),
-                                timeText.getText().toString().replace("Pasirinktas laikas: ", ""), savedProductsKeys);
-                            ref.push().setValue(mealTimeStamp);
-                            Toast.makeText(MealLogActivity.this, "Išsaugota", Toast.LENGTH_SHORT).show();
-                            finish();
-                        }
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) { }
-                    });
+                insertMealTimeStamp();
+            }
+        });
+    }
+    private void insertMealTimeStamp()
+    {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReference("users").child(currentUser.getUid()).child("mealTimeStamps");
+            ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    ArrayList<String> savedProductsKeys = new ArrayList<>();
+                    for (int i = 0; i < savedProducts.size(); i++) savedProductsKeys.add(savedProducts.get(i).getKey());
+                    MealTimeStamp mealTimeStamp = new MealTimeStamp(dateText.getText().toString().replace("Pasirinkta data: ", ""),
+                            timeText.getText().toString().replace("Pasirinktas laikas: ", ""), savedProductsKeys);
+                    ref.push().setValue(mealTimeStamp);
+                    Toast.makeText(MealLogActivity.this, "Išsaugota", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+                @Override
+                public void onCancelled(DatabaseError databaseError) { }
+            });
+        }
+    }
+    private void receiveUserProducts(FirebaseUser currentUser) {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("users").child(currentUser.getUid()).child("products");
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot productSnapshot: dataSnapshot.getChildren()) {
+                    allProducts.add(new Product(productSnapshot.child("name").getValue(String.class), "", true));
                 }
             }
+            @Override
+            public void onCancelled(DatabaseError databaseError) { }
+        });
+    }
+    private void receiveLocalProducts() {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("products");
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot productSnapshot: dataSnapshot.getChildren()) {
+                    allProducts.add(new Product(productSnapshot.child("Lithuanian name").getValue(String.class), "", false));
+                }
+                isProductDataFetched = true;
+                productsProgressBar.setVisibility(View.GONE);
+                if (productAdapter == null) setupProductAdapter();
+                else productAdapter.notifyDataSetChanged();
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) { }
         });
     }
 }

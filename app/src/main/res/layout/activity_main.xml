@@ -30,7 +30,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/goToMealLogButton"
+        android:id="@+id/goToAddMealLogButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="80dp"
@@ -43,7 +43,7 @@
         app:layout_constraintTop_toBottomOf="@+id/goToMyProducts" />
 
     <Button
-        android:id="@+id/goToMealLogDataButton"
+        android:id="@+id/goToInspectMealLogDataButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
@@ -51,6 +51,6 @@
         android:text="Eiti į mitybos veiklos duomenų atvaizdavimą"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/goToMealLogButton"/>
+        app:layout_constraintTop_toBottomOf="@+id/goToAddMealLogButton"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

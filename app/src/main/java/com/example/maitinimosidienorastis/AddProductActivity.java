@@ -31,7 +31,6 @@ public class AddProductActivity extends AppCompatActivity {
 
     private Map<String, TextInputEditText> editFieldsMap = new HashMap<>();
     Button addProductButton;
-    Integer productsCount;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,44 +58,54 @@ public class AddProductActivity extends AppCompatActivity {
                 FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
                 if (currentUser != null) addProductToDB(currentUser);
                 else {
-                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                    Intent intent = new Intent(AddProductActivity.this, LoginActivity.class);
+                    startActivity(intent);
+                }
+            }
+        });
+    }
+    private void addProductToDB(FirebaseUser currentUser) {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("users").child(currentUser.getUid()).child("products");
+        isProductNameExists(new ProductNameExistsCallback() {
+            @Override
+            public void onCallBack(boolean productNameExists) {
+                if (productNameExists) Toast.makeText(AddProductActivity.this, "Produktas su tuo pačiu pavadinimu jau egzistuoja", Toast.LENGTH_SHORT).show();
+                else {
+                    Map<String, String> fieldValues = editFieldsMap.entrySet().stream()
+                            .collect(Collectors.toMap(
+                                    Map.Entry::getKey,
+                                    entry -> {
+                                        String value = entry.getValue().getText().toString().trim();
+                                        return value.isEmpty() ? "No Data" : value;
+                                    }
+                            ));
+                    Product product = new Product(fieldValues);
+                    ref.push().setValue(product);
+                    Toast.makeText(AddProductActivity.this, "Produktas sėkmingai pridėtas", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(getApplicationContext(), MyProductsActivity.class);
                     startActivity(intent);
                     finish();
                 }
             }
-        });
-        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                Intent intent = new Intent(AddProductActivity.this, MyProductsActivity.class);
-                startActivity(intent);
-                finish();
-            }
-        };
-        getOnBackPressedDispatcher().addCallback(this, callback);
+        }, ref);
     }
-    private void addProductToDB(FirebaseUser currentUser) {
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("users").child(currentUser.getUid()).child("products");
+    private void isProductNameExists(ProductNameExistsCallback callback, DatabaseReference ref) {
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Map<String, String> fieldValues = editFieldsMap.entrySet().stream()
-                        .collect(Collectors.toMap(
-                                Map.Entry::getKey,
-                                entry -> {
-                                    String value = entry.getValue().getText().toString();
-                                    return value.trim().isEmpty() ? "No Data" : value;
-                                }
-                        ));
-                Product product = new Product(fieldValues);
-                ref.push().setValue(product);
-                Toast.makeText(AddProductActivity.this, "Produktas sėkmingai pridėtas", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(getApplicationContext(), MyProductsActivity.class);
-                startActivity(intent);
-                finish();
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String newProductName = editFieldsMap.get("name").getText().toString().trim();
+                boolean exists = false;
+                for (DataSnapshot productSnapshot : dataSnapshot.getChildren()) {
+                    String existingProductName = productSnapshot.child("name").getValue(String.class);
+                    if (existingProductName != null && existingProductName.equals(newProductName)) {
+                        exists = true;
+                        break;
+                    }
+                }
+                callback.onCallBack(exists);
             }
             @Override
-            public void onCancelled(DatabaseError databaseError) { }
+            public void onCancelled(@NonNull DatabaseError error) { callback.onCallBack(false); }
         });
     }
 }

@@ -30,8 +30,44 @@ public class UpdateProductActivity extends AppCompatActivity {
         setContentView(R.layout.activity_update_product);
         updateProductButton = findViewById(R.id.updateProductButton);
         setupEditFieldsMap();
-        DatabaseReference productsRef = FirebaseDatabase.getInstance().getReference("users")
-                .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("products");
+        DatabaseReference productsRef = FirebaseDatabase.getInstance().getReference("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("products");
+        getDataForProductFieldsFromDB(productsRef);
+        setupUpdateProductButton(productsRef);
+    }
+    private void setupEditFieldsMap() {
+        String[] fieldNames = {
+                "name", "edibleCoefficient", "water", "dryMatter", "proteinTotal", "proteinAnimal",
+                "proteinPlant", "fatTotal", "fattyAcidsTotalSaturated", "fattyAcidsTotalMonounsaturated",
+                "fattyAcidsTotalPolyunsaturated", "cholesterol", "carbohydrates", "starch", "sugars",
+                "fibre", "ashMinerals", "sodium", "magnesium", "phosphorus", "potassium", "calcium",
+                "iron", "zinc", "selenium", "iodide", "vitaminA_RE", "vitaminD", "vitaminE_TE",
+                "thiamin", "riboflavin", "niacin", "niacinEquivalent", "folicAcid", "vitaminB6",
+                "vitaminB12", "vitaminC", "alcohol", "energyValueKJ", "energyValueKCAL"
+        };
+        for (String fieldName : fieldNames) editFieldsMap.put(fieldName, findViewById(getResources().getIdentifier(fieldName, "id", getPackageName())));
+    }
+    private void isProductNameExists(ProductNameExistsCallback callback) {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("products");
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String newProductName = editFieldsMap.get("name").getText().toString().trim();
+                String currentProductKey = getIntent().getStringExtra("PRODUCT_KEY");
+                boolean exists = false;
+                for (DataSnapshot productSnapshot : dataSnapshot.getChildren()) {
+                    String existingProductName = productSnapshot.child("name").getValue(String.class);
+                    if (!productSnapshot.getKey().equals(currentProductKey) && existingProductName.equals(newProductName)) {
+                        exists = true;
+                        break;
+                    }
+                }
+                callback.onCallBack(exists);
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) { callback.onCallBack(false); }
+        });
+    }
+    private void getDataForProductFieldsFromDB(DatabaseReference productsRef) {
         productsRef.orderByKey().equalTo(getIntent().getStringExtra("PRODUCT_KEY")).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -47,35 +83,33 @@ public class UpdateProductActivity extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {}
         });
+    }
+    private void setupUpdateProductButton(DatabaseReference productsRef) {
         updateProductButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Map<String, Object> updateMap = new HashMap<>();
-                for (Map.Entry<String, TextInputEditText> entry : editFieldsMap.entrySet()) {
-                    TextInputEditText editText = entry.getValue();
-                    updateMap.put(entry.getKey(), editText.getText().toString().trim().equals("") ? "No Data" : editText.getText().toString().trim());
-                }
-                productsRef.child(getIntent().getStringExtra("PRODUCT_KEY")).updateChildren(updateMap)
-                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Toast.makeText(UpdateProductActivity.this, "Produktas atnaujintas sėkmingai", Toast.LENGTH_SHORT).show();
+                isProductNameExists(new ProductNameExistsCallback() {
+                    @Override
+                    public void onCallBack(boolean exists) {
+                        if (exists) Toast.makeText(UpdateProductActivity.this, "Produktas su tuo pačiu pavadinimu jau egzistuoja", Toast.LENGTH_SHORT).show();
+                        else {
+                            Map<String, Object> updateMap = new HashMap<>();
+                            for (Map.Entry<String, TextInputEditText> entry : editFieldsMap.entrySet()) {
+                                TextInputEditText editText = entry.getValue();
+                                updateMap.put(entry.getKey(), editText.getText().toString().trim().equals("") ? "No Data" : editText.getText().toString().trim());
+                            }
+                            productsRef.child(getIntent().getStringExtra("PRODUCT_KEY")).updateChildren(updateMap)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            Toast.makeText(UpdateProductActivity.this, "Produktas atnaujintas sėkmingai", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                            finish();
                         }
-                    });
-                finish();
+                    }
+                });
             }
         });
-    }
-    private void setupEditFieldsMap() {
-        String[] fieldNames = {
-                "name", "edibleCoefficient", "water", "dryMatter", "proteinTotal", "proteinAnimal",
-                "proteinPlant", "fatTotal", "fattyAcidsTotalSaturated", "fattyAcidsTotalMonounsaturated",
-                "fattyAcidsTotalPolyunsaturated", "cholesterol", "carbohydrates", "starch", "sugars",
-                "fibre", "ashMinerals", "sodium", "magnesium", "phosphorus", "potassium", "calcium",
-                "iron", "zinc", "selenium", "iodide", "vitaminA_RE", "vitaminD", "vitaminE_TE",
-                "thiamin", "riboflavin", "niacin", "niacinEquivalent", "folicAcid", "vitaminB6",
-                "vitaminB12", "vitaminC", "alcohol", "energyValueKJ", "energyValueKCAL"
-        };
-        for (String fieldName : fieldNames) editFieldsMap.put(fieldName, findViewById(getResources().getIdentifier(fieldName, "id", getPackageName())));
     }
 }

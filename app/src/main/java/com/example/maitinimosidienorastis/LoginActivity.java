@@ -44,40 +44,52 @@ public class LoginActivity extends AppCompatActivity {
         loginButton = findViewById(R.id.loginButton);
         loginProgressBar = findViewById(R.id.registerProgressBar);
         clickToRegisterText = findViewById(R.id.registerNow);
+        setupLoginButton();
+        setupClickToRegisterText();
+    }
+    private void setupLoginButton() {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String email = String.valueOf(editTextEmail.getText());
                 String password = String.valueOf(editTextPassword.getText());
-                if (TextUtils.isEmpty(email)) {
-                    Toast.makeText(LoginActivity.this, "Įrašykite el. paštą", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                if (TextUtils.isEmpty(password)) {
-                    Toast.makeText(LoginActivity.this, "Įrašykite slaptažodį", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                loginProgressBar.setVisibility(View.VISIBLE);
-                auth.signInWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        loginProgressBar.setVisibility(View.GONE);
-                        if (task.isSuccessful()) {
-                            Toast.makeText(LoginActivity.this, "Sveiki!", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                            startActivity(intent);
-                        }
-                        else Toast.makeText(LoginActivity.this, "Nepavyko prisijungti prie paskyros", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                if (canUserLogIn(email, password)) logInUser(email, password);
             }
         });
+    }
+    private void setupClickToRegisterText() {
         clickToRegisterText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
                 startActivity(intent);
+            }
+        });
+    }
+    private boolean canUserLogIn(String email, String password) {
+        if (TextUtils.isEmpty(email)) {
+            Toast.makeText(LoginActivity.this, "Įrašykite el. paštą", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        if (TextUtils.isEmpty(password)) {
+            Toast.makeText(LoginActivity.this, "Įrašykite slaptažodį", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        return true;
+    }
+    private void logInUser(String email, String password) {
+        loginProgressBar.setVisibility(View.VISIBLE);
+        auth.signInWithEmailAndPassword(email, password)
+        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                loginProgressBar.setVisibility(View.GONE);
+                if (task.isSuccessful()) {
+                    Toast.makeText(LoginActivity.this, "Sveiki!", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    startActivity(intent);
+                }
+                else Toast.makeText(LoginActivity.this, "Nepavyko prisijungti prie paskyros", Toast.LENGTH_SHORT).show();
             }
         });
     }

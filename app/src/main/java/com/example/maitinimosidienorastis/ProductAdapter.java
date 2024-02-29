@@ -1,6 +1,7 @@
 package com.example.maitinimosidienorastis;
 
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,53 +37,26 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         this.listener = listener;
     }
     public Product getProduct(int position) { return this.showcaseProductsList.get(position); }
-
     @NonNull
     @Override
     public ProductViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new ProductViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.product_row, parent, false));
     }
-
     @Override
     public void onBindViewHolder(@NonNull ProductViewHolder holder, int position) {
         Product product = showcaseProductsList.get(position);
         holder.productId.setText(String.valueOf(position + 1));
         holder.productName.setText(product.getName());
-        if (this.isClickEnabled) {
-            holder.mainView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    listener.onItemClick(showcaseProductsList.get(holder.getAdapterPosition()));
-                }
-            });
-            holder.deleteLayout.setVisibility(View.GONE);
-            holder.editLayout.setVisibility(View.GONE);
-        }
+        if (!product.getIsMineNeededToShow()) holder.myProductImageLayout.setVisibility(View.GONE);
+        else holder.myProductImageLayout.setVisibility(View.VISIBLE);
+        if (this.isClickEnabled) setupIsClickEnabledLogic(holder);
         else {
-            holder.deleteButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    DatabaseReference productsRef = FirebaseDatabase.getInstance().getReference("users")
-                            .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("products");
-                    productsRef.child(product.getKey()).removeValue();
-                }
-            });
-            holder.editButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent intent = new Intent(view.getContext(), UpdateProductActivity.class);
-                    intent.putExtra("PRODUCT_KEY", product.getKey());
-                    view.getContext().startActivity(intent);
-                }
-            });
+            setupDeleteProductButton(holder, product);
+            setupEditProductButton(holder, product);
         }
     }
-
     @Override
-    public int getItemCount() {
-        return Math.min(showcaseProductsList.size(), 10);
-    }
-
+    public int getItemCount() { return Math.min(showcaseProductsList.size(), 10); }
     public void filter(String text) {
         this.showcaseProductsList.clear();
         if (text.isEmpty()) this.showcaseProductsList.addAll(this.allProductsList);
@@ -93,11 +67,10 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         }
         notifyDataSetChanged();
     }
-
     public class ProductViewHolder extends RecyclerView.ViewHolder {
         TextView productId, productName;
         Button deleteButton, editButton;
-        ConstraintLayout editLayout, deleteLayout;
+        ConstraintLayout editLayout, deleteLayout, myProductImageLayout;
         LinearLayout mainView;
         public ProductViewHolder(@NonNull View productView) {
             super(productView);
@@ -107,9 +80,39 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             deleteLayout = productView.findViewById(R.id.deleteLayout);
             editButton = productView.findViewById(R.id.editButton);
             editLayout = productView.findViewById(R.id.editLayout);
+            myProductImageLayout = productView.findViewById(R.id.myProductLayout);
             mainView = productView.findViewById(R.id.mainView);
         }
     }
-
     public void setShowcaseProductsList() { this.showcaseProductsList = this.allProductsList; }
+    private void setupIsClickEnabledLogic(ProductViewHolder holder) {
+        holder.mainView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                listener.onItemClick(showcaseProductsList.get(holder.getAdapterPosition()));
+            }
+        });
+        holder.deleteLayout.setVisibility(View.GONE);
+        holder.editLayout.setVisibility(View.GONE);
+    }
+    private void setupDeleteProductButton(ProductViewHolder holder, Product product) {
+        holder.deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DatabaseReference productsRef = FirebaseDatabase.getInstance().getReference("users")
+                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("products");
+                productsRef.child(product.getKey()).removeValue();
+            }
+        });
+    }
+    private void setupEditProductButton(ProductViewHolder holder, Product product) {
+        holder.editButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(view.getContext(), UpdateProductActivity.class);
+                intent.putExtra("PRODUCT_KEY", product.getKey());
+                view.getContext().startActivity(intent);
+            }
+        });
+    }
 }

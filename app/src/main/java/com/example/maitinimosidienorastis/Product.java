@@ -8,9 +8,11 @@ public class Product {
             starch, sugars, fibre, ashMinerals, sodium, magnesium, phosphorus, potassium, calcium, iron, zinc, selenium, iodide,
             vitaminA_RE, vitaminD, vitaminE_TE, thiamin, riboflavin, niacin, niacinEquivalent, folicAcid, vitaminB6, vitaminB12,
             vitaminC, alcohol, energyValueKJ, energyValueKCAL;
-    public Product(String name, String key){
+    private boolean isMineNeededToShow;
+    public Product(String name, String key, boolean isMineNeededToShow){
         this.name = name;
         this.key = key;
+        this.isMineNeededToShow = isMineNeededToShow;
     }
     public Product(Map<String, String> fieldValues) {
         this.name = fieldValues.get("name");
@@ -53,6 +55,7 @@ public class Product {
         this.alcohol = fieldValues.get("alcohol");
         this.energyValueKJ = fieldValues.get("energyValueKJ");
         this.energyValueKCAL = fieldValues.get("energyValueKCAL");
+        this.isMineNeededToShow = false;
     }
     public String getName() { return this.name; }
     public String getKey() { return this.key; }
@@ -95,4 +98,5 @@ public class Product {
     public String getAlcohol() { return this.alcohol; }
     public String getEnergyValueKJ() { return this.energyValueKJ; }
     public String getEnergyValueKCAL() { return this.energyValueKCAL; }
+    public boolean getIsMineNeededToShow() { return this.isMineNeededToShow; }
 }
