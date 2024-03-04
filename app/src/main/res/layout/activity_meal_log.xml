@@ -18,33 +18,104 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/dateButton"
-        android:layout_width="wrap_content"
+    <EditText
+        android:id="@+id/searchField"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:text="Pasirinkti datą"
+        android:hint="Ieškoti produktus"
+        android:inputType="text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/mealLogTitle" />
 
-    <Button
-        android:id="@+id/timeButton"
+    <TextView
+        android:id="@+id/dateTextPlaceholder"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Pasirinkti laiką"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:text="Pasirinkta data: "
+        android:textColor="#000000"
+        android:textSize="20sp"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/dateButton" />
+        app:layout_constraintTop_toBottomOf="@+id/searchField" />
+
+    <TextView
+        android:id="@+id/dateText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="Nėra pasirinktos datos"
+        android:textColor="#A020F0"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/dateTextPlaceholder"
+        app:layout_constraintTop_toBottomOf="@+id/searchField" />
+
+    <TextView
+        android:id="@+id/timeTextPlaceholder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:text="Pasirinktas laikas: "
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/dateTextPlaceholder" />
+
+    <TextView
+        android:id="@+id/timeText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="Nėra pasirinkto laiko"
+        android:textColor="#A020F0"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/timeTextPlaceholder"
+        app:layout_constraintTop_toBottomOf="@+id/dateText" />
+
+    <TextView
+        android:id="@+id/productsTextPlaceholder"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:text="Pasirinkti produktai: "
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/timeTextPlaceholder" />
+
+    <ScrollView
+        android:id="@+id/scrollViewProductsText"
+        android:layout_width="match_parent"
+        android:layout_height="500dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/productsTextPlaceholder">
+        <TextView
+            android:id="@+id/productsText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:paddingBottom="10dp"
+            android:textSize="20sp"
+            android:textStyle="bold"/>
+    </ScrollView>
 
     <Button
         android:id="@+id/productsButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Pasirinkti produktus"
+        android:layout_marginRight="10dp"
+        android:text="Pridėti produktą"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/timeButton" />
+        app:layout_constraintTop_toBottomOf="@+id/timeText" />
 
     <ProgressBar
         android:id="@+id/productsProgressBar"
@@ -55,63 +126,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/productsButton" />
 
-    <EditText
-        android:id="@+id/searchField"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:hint="Ieškoti produktus"
-        android:inputType="text"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/productsButton" />
-
-    <TextView
-        android:id="@+id/dateText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="50dp"
-        android:text="Pasirinkta data: "
-        android:textColor="#000000"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/productsButton" />
-
-    <TextView
-        android:id="@+id/timeText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
-        android:text="Pasirinktas laikas: "
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/dateText" />
-
-    <ScrollView
-        android:id="@+id/productsTextScrollView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/timeText">
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-            <TextView
-                android:id="@+id/productsText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Pasirinkti produktai: "
-                android:textSize="20sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-    </ScrollView>
-
     <Button
         android:id="@+id/insertButton"
         android:layout_width="wrap_content"
@@ -120,7 +134,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/productsTextScrollView" />
+        app:layout_constraintTop_toBottomOf="@+id/scrollViewProductsText" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/allProductsList"

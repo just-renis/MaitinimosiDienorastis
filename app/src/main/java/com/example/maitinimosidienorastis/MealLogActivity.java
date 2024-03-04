@@ -1,15 +1,18 @@
 package com.example.maitinimosidienorastis;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -37,8 +40,8 @@ import java.util.Map;
 
 public class MealLogActivity extends AppCompatActivity implements ProductViewListener{
 
-    private Button dateButton, timeButton, productsButton, insertButton;
-    private TextView dateText, timeText, productsText;
+    private Button productsButton, insertButton;
+    private TextView dateTextPlaceholder, timeTextPlaceholder, productsTextPlaceholder, productsText, dateText, timeText;
     private Calendar calendar;
     private List<Product> allProducts, savedProducts;
     private boolean isProductDataFetched = false, isShowingProducts = false;
@@ -50,12 +53,15 @@ public class MealLogActivity extends AppCompatActivity implements ProductViewLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_meal_log);
-        dateButton = findViewById(R.id.dateButton);
-        timeButton = findViewById(R.id.timeButton);
         productsButton = findViewById(R.id.productsButton);
         insertButton = findViewById(R.id.insertButton);
+        dateTextPlaceholder = findViewById(R.id.dateTextPlaceholder);
+        timeTextPlaceholder = findViewById(R.id.timeTextPlaceholder);
+        productsTextPlaceholder = findViewById(R.id.productsTextPlaceholder);
         dateText = findViewById(R.id.dateText);
+        dateText.setPaintFlags(dateText.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
         timeText = findViewById(R.id.timeText);
+        timeText.setPaintFlags(timeText.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
         productsText = findViewById(R.id.productsText);
         allProductsList = findViewById(R.id.allProductsList);
         allProductsList.setVisibility(View.GONE);
@@ -69,9 +75,10 @@ public class MealLogActivity extends AppCompatActivity implements ProductViewLis
         setupTimeButton();
         setupProductsButton();
         setupInsertButton();
+        setupOnBackPressedButton();
     }
     private void setupDateButton() {
-        dateButton.setOnClickListener(new View.OnClickListener() {
+        dateText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 int year = calendar.get(Calendar.YEAR);
@@ -90,22 +97,22 @@ public class MealLogActivity extends AppCompatActivity implements ProductViewLis
     }
     private void setDateText(int year, int month, int day) {
         switch(month) {
-            case 0: dateText.setText("Pasirinkta data: " + year + " Sausio " + day); return;
-            case 1: dateText.setText("Pasirinkta data: " + year + " Vasario " + day); return;
-            case 2: dateText.setText("Pasirinkta data: " + year + " Kovo " + day); return;
-            case 3: dateText.setText("Pasirinkta data: " + year + " Balandžio " + day); return;
-            case 4: dateText.setText("Pasirinkta data: " + year + " Gegužės " + day); return;
-            case 5: dateText.setText("Pasirinkta data: " + year + " Birželio " + day); return;
-            case 6: dateText.setText("Pasirinkta data: " + year + " Liepos " + day); return;
-            case 7: dateText.setText("Pasirinkta data: " + year + " Rugpjūčio " + day); return;
-            case 8: dateText.setText("Pasirinkta data: " + year + " Rugsėjo " + day); return;
-            case 9: dateText.setText("Pasirinkta data: " + year + " Spalio " + day); return;
-            case 10: dateText.setText("Pasirinkta data: " + year + " Lapkričio " + day); return;
-            default: dateText.setText("Pasirinkta data: " + year + " Gruodžio " + day);
+            case 0: dateText.setText(year + " Sausio " + day); return;
+            case 1: dateText.setText(year + " Vasario " + day); return;
+            case 2: dateText.setText(year + " Kovo " + day); return;
+            case 3: dateText.setText(year + " Balandžio " + day); return;
+            case 4: dateText.setText(year + " Gegužės " + day); return;
+            case 5: dateText.setText(year + " Birželio " + day); return;
+            case 6: dateText.setText(year + " Liepos " + day); return;
+            case 7: dateText.setText(year + " Rugpjūčio " + day); return;
+            case 8: dateText.setText(year + " Rugsėjo " + day); return;
+            case 9: dateText.setText(year + " Spalio " + day); return;
+            case 10: dateText.setText(year + " Lapkričio " + day); return;
+            default: dateText.setText(year + " Gruodžio " + day);
         }
     }
     private void setupTimeButton() {
-        timeButton.setOnClickListener(new View.OnClickListener() {
+        timeText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 int hour = calendar.get(Calendar.HOUR_OF_DAY);
@@ -114,7 +121,7 @@ public class MealLogActivity extends AppCompatActivity implements ProductViewLis
                         new TimePickerDialog.OnTimeSetListener() {
                             @Override
                             public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                                timeText.setText("Pasirinktas laikas: " + hourOfDay + " val. " + minute + " min.");
+                                timeText.setText(hourOfDay + " val. " + minute + " min.");
                             }
                         }, hour, minute, true);
                 timePickerDialog.show();
@@ -147,15 +154,19 @@ public class MealLogActivity extends AppCompatActivity implements ProductViewLis
         searchField.setText("");
         searchField.setVisibility(state ? View.GONE : View.VISIBLE);
         allProductsList.setVisibility(state ? View.GONE : View.VISIBLE);
+        dateTextPlaceholder.setVisibility(state ? View.VISIBLE : View.GONE);
+        timeTextPlaceholder.setVisibility(state ? View.VISIBLE : View.GONE);
+        productsTextPlaceholder.setVisibility(state ? View.VISIBLE : View.GONE);
         dateText.setVisibility(state ? View.VISIBLE : View.GONE);
         timeText.setVisibility(state ? View.VISIBLE : View.GONE);
         productsText.setVisibility(state ? View.VISIBLE : View.GONE);
+        productsButton.setVisibility(state ? View.VISIBLE : View.GONE);
         insertButton.setVisibility(state ? View.VISIBLE : View.GONE);
-        StringBuilder savedProductsText = new StringBuilder();
-        for (int i = 0; i < savedProducts.size(); i++) {
+        StringBuilder savedProductsText = new StringBuilder("1. " + (savedProducts.size() > 0 ? savedProducts.get(0).getName() : ""));
+        for (int i = 1; i < savedProducts.size(); i++) {
             savedProductsText.append("\n").append((i + 1)).append(". ").append(savedProducts.get(i).getName());
         }
-        productsText.setText("Pasirinkti produktai: " + savedProductsText);
+        productsText.setText(savedProductsText);
     }
     private void setupProductAdapter() {
         productAdapter = new ProductAdapter(allProducts, MealLogActivity.this);
@@ -176,11 +187,11 @@ public class MealLogActivity extends AppCompatActivity implements ProductViewLis
         insertButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (TextUtils.isEmpty(dateText.getText().toString().replace("Pasirinkta data: ", ""))) {
+                if (TextUtils.isEmpty(dateText.getText().toString().replace("Nėra pasirinktos datos", ""))) {
                     Toast.makeText(MealLogActivity.this, "Pasirinkite datą", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                if (TextUtils.isEmpty(timeText.getText().toString().replace("Pasirinktas laikas: ", ""))) {
+                if (TextUtils.isEmpty(timeText.getText().toString().replace("Nėra pasirinkto laiko", ""))) {
                     Toast.makeText(MealLogActivity.this, "Pasirinkite laiką", Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -207,8 +218,7 @@ public class MealLogActivity extends AppCompatActivity implements ProductViewLis
                         if (savedProducts.get(i).getIsMineNeededToShow()) personalProductsKeys.add(savedProducts.get(i).getKey());
                         else localProductsKeys.add(savedProducts.get(i).getKey());
                     }
-                    MealTimeStamp mealTimeStamp = new MealTimeStamp(dateText.getText().toString().replace("Pasirinkta data: ", ""),
-                            timeText.getText().toString().replace("Pasirinktas laikas: ", ""), personalProductsKeys, localProductsKeys);
+                    MealTimeStamp mealTimeStamp = new MealTimeStamp(dateText.getText().toString(), timeText.getText().toString(), personalProductsKeys, localProductsKeys);
                     ref.push().setValue(mealTimeStamp);
                     Toast.makeText(MealLogActivity.this, "Išsaugota", Toast.LENGTH_SHORT).show();
                     finish();
@@ -247,5 +257,15 @@ public class MealLogActivity extends AppCompatActivity implements ProductViewLis
             @Override
             public void onCancelled(DatabaseError databaseError) { }
         });
+    }
+    private void setupOnBackPressedButton() {
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (isShowingProducts) setVisibility(isShowingProducts);
+                else finish();
+            }
+        };
+        getOnBackPressedDispatcher().addCallback(this, callback);
     }
 }

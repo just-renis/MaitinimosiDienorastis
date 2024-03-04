@@ -5,8 +5,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -27,6 +29,7 @@ public class MealLogDataActivity extends AppCompatActivity implements MealLogVie
     private MealLogDataAdapter adapter;
     private List<MealTimeStamp> mealTimeStampsList;
     private TextView noMealLogsText;
+    private Button generateReportButton;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,6 +40,8 @@ public class MealLogDataActivity extends AppCompatActivity implements MealLogVie
         adapter = new MealLogDataAdapter(mealTimeStampsList, MealLogDataActivity.this);
         mealLogDataList.setAdapter(adapter);
         mealLogDataList.setLayoutManager(new LinearLayoutManager(this));
+        generateReportButton = findViewById(R.id.generateReportButton);
+        setupGenerateReportButton();
         getMealTimeStamps();
     }
     private void getMealTimeStamps() {
@@ -76,6 +81,15 @@ public class MealLogDataActivity extends AppCompatActivity implements MealLogVie
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) { callback.onCallBack(); }
+        });
+    }
+    private void setupGenerateReportButton() {
+        generateReportButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MealLogDataActivity.this, GenerateReportActivity.class);
+                startActivity(intent);
+            }
         });
     }
 

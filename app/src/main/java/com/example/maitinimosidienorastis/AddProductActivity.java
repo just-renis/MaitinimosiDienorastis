@@ -78,8 +78,6 @@ public class AddProductActivity extends AppCompatActivity {
                     Product product = new Product(fieldValues);
                     ref.push().setValue(product);
                     Toast.makeText(AddProductActivity.this, "Produktas sėkmingai pridėtas", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(getApplicationContext(), MyProductsActivity.class);
-                    startActivity(intent);
                     finish();
                 }
             }
