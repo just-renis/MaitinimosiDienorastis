@@ -1,5 +1,6 @@
 package com.example.maitinimosidienorastis;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class MealLogDataAdapter extends RecyclerView.Adapter<MealLogDataAdapter.MealLogDataViewHolder> {
     private List<MealTimeStamp> mealTimeStampsList;
@@ -35,8 +37,8 @@ public class MealLogDataAdapter extends RecyclerView.Adapter<MealLogDataAdapter.
     public void onBindViewHolder(@NonNull MealLogDataViewHolder holder, int position) {
         MealTimeStamp mealTimeStamp = mealTimeStampsList.get(position);
         holder.logId.setText(String.valueOf(position + 1));
-        holder.date.setText(mealTimeStamp.getDate());
-        holder.time.setText(mealTimeStamp.getTime());
+        holder.date.setText(getFormattedDate(mealTimeStamp.getDate()));
+        holder.time.setText(getFormattedTime(mealTimeStamp.getTime()));
         setupDeleteMealLogDataButton(holder, mealTimeStamp);
     }
     @Override
@@ -65,5 +67,43 @@ public class MealLogDataAdapter extends RecyclerView.Adapter<MealLogDataAdapter.
                 ref.child(mealTimeStamp.getKey()).removeValue();
             }
         });
+    }
+    private String getFormattedDate(String dateText) {
+        String[] dateParts = dateText.split(" ");
+        return String.format(Locale.getDefault(), "%d %s %d", Integer.parseInt(dateParts[0]), getMonthName(Integer.parseInt(dateParts[1])), Integer.parseInt(dateParts[2]));
+    }
+    private String getFormattedTime(String timeText) {
+        String[] timeParts = timeText.split(" ");
+        return String.format(Locale.getDefault(), "%d val. %d min.", Integer.parseInt(timeParts[0]), Integer.parseInt(timeParts[1]));
+    }
+    private String getMonthName(int monthIndex) {
+        switch (monthIndex) {
+            case 1:
+                return "Sausio";
+            case 2:
+                return "Vasario";
+            case 3:
+                return "Kovo";
+            case 4:
+                return "Balandžio";
+            case 5:
+                return "Gegužės";
+            case 6:
+                return "Birželio";
+            case 7:
+                return "Liepos";
+            case 8:
+                return "Rugpjūčio";
+            case 9:
+                return "Rugsėjo";
+            case 10:
+                return "Spalio";
+            case 11:
+                return "Lapkričio";
+            case 12:
+                return "Gruodžio";
+            default:
+                return "Sausio";
+        }
     }
 }

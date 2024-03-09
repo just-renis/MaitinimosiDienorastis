@@ -1,5 +1,6 @@
 package com.example.maitinimosidienorastis;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
@@ -16,6 +17,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -30,16 +32,28 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import android.Manifest;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class GenerateReportActivity extends AppCompatActivity {
 
     private TextView fromDateText, fromTimeText, toDateText, toTimeText;
     private Calendar calendar;
     private Button generateReportButton;
-
+    private ArrayList<Product> localProducts = new ArrayList<>();
+    private ArrayList<Product> personalProducts = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -168,79 +182,230 @@ public class GenerateReportActivity extends AppCompatActivity {
     private int getMonthIndex(String monthName) {
         switch (monthName) {
             case "Sausio":
-                return 0;
-            case "Vasario":
                 return 1;
-            case "Kovo":
+            case "Vasario":
                 return 2;
-            case "Balandžio":
+            case "Kovo":
                 return 3;
-            case "Gegužės":
+            case "Balandžio":
                 return 4;
-            case "Birželio":
+            case "Gegužės":
                 return 5;
-            case "Liepos":
+            case "Birželio":
                 return 6;
-            case "Rugpjūčio":
+            case "Liepos":
                 return 7;
-            case "Rugsėjo":
+            case "Rugpjūčio":
                 return 8;
-            case "Spalio":
+            case "Rugsėjo":
                 return 9;
-            case "Lapkričio":
+            case "Spalio":
                 return 10;
-            case "Gruodžio":
+            case "Lapkričio":
                 return 11;
+            case "Gruodžio":
+                return 12;
             default:
-                return 0;
+                return 1;
         }
     }
 
     private boolean canGenerateReport() {
-        String[] fromDate = fromDateText.getText().toString().split(" ");
-        int fromYear = Integer.parseInt(fromDate[0]);
-        int fromMonth = getMonthIndex(fromDate[1]);
-        int fromDay = Integer.parseInt(fromDate[2]);
-        String[] toDate = toDateText.getText().toString().split(" ");
-        int toYear = Integer.parseInt(toDate[0]);
-        int toMonth = getMonthIndex(toDate[1]);
-        int toDay = Integer.parseInt(toDate[2]);
-        String[] fromTime = fromTimeText.getText().toString().split(" ");
-        int fromHour = Integer.parseInt(fromTime[0]);
-        int fromMinutes = Integer.parseInt(fromTime[2]);
-        String[] toTime = toTimeText.getText().toString().split(" ");
-        int toHour = Integer.parseInt(toTime[0]);
-        int toMinutes = Integer.parseInt(toTime[2]);
-        if (fromYear > toYear) return false;
-        if (fromYear == toYear) {
-            if (fromMonth > toMonth) return false;
-            if (fromMonth == toMonth) {
-                if (fromDay > toDay) return false;
-                if (fromDay == toDay) {
-                    if (fromHour > toHour) return false;
-                    if (fromHour == toHour) return fromMinutes < toMinutes;
-                }
-            }
-        }
-        return true;
+        long fromDate = getMillisFromDateTime(fromDateText.getText().toString(), fromTimeText.getText().toString(), false);
+        long toDate = getMillisFromDateTime(toDateText.getText().toString(), toTimeText.getText().toString(), false);
+        return fromDate < toDate;
     }
 
     private void generateReportAndDownload() {
         HSSFWorkbook excel = new HSSFWorkbook();
         HSSFSheet sheet = excel.createSheet("Ataskaitos duomenys");
-        HSSFRow row1 = sheet.createRow(0);
-        HSSFCell cell1 = row1.createCell(0);
-        cell1.setCellValue(fromDateText.getText().toString());
-        HSSFCell cell2 = row1.createCell(1);
-        cell2.setCellValue(toDateText.getText().toString());
-        HSSFRow row2 = sheet.createRow(1);
-        HSSFCell cell3 = row2.createCell(0);
-        cell3.setCellValue(fromTimeText.getText().toString());
-        HSSFCell cell4 = row2.createCell(1);
-        cell4.setCellValue(toTimeText.getText().toString());
-        downloadExcel(excel);
-    }
+        setAndProcessValidMealTimeStamps(new ReportDataLoadedCallback() {
+            @Override
+            public void onCallBack() {
+                double water = 0, dryMatter = 0, protein = 0, fat = 0, carbohydrates = 0;
+                for (int i = 0; i < localProducts.size(); i++) {
+                    Product product = localProducts.get(i);
+                    Log.d("WATER: ", product.getWater() + " " + Double.parseDouble(product.getWater()));
+                    if (!product.getWater().equals("No Data")) water += Double.parseDouble(product.getWater());
+                    if (!product.getDryMatter().equals("No Data")) dryMatter += Double.parseDouble(product.getDryMatter());
+                    if (!product.getProteinTotal().equals("No Data")) protein += Double.parseDouble(product.getProteinTotal());
+                    if (!product.getFatTotal().equals("No Data")) fat += Double.parseDouble(product.getFatTotal());
+                    if (!product.getCarbohydrates().equals("No Data")) carbohydrates += Double.parseDouble(product.getCarbohydrates());
+                }
+                for (int i = 0; i < personalProducts.size(); i++) {
+                    Product product = personalProducts.get(i);
+                    Log.d("WATER: ", product.getWater() + " " + Double.parseDouble(product.getWater()));
+                    if (!product.getWater().equals("No Data")) water += Double.parseDouble(product.getWater());
+                    if (!product.getDryMatter().equals("No Data")) dryMatter += Double.parseDouble(product.getDryMatter());
+                    if (!product.getProteinTotal().equals("No Data")) protein += Double.parseDouble(product.getProteinTotal());
+                    if (!product.getFatTotal().equals("No Data")) fat += Double.parseDouble(product.getFatTotal());
+                    if (!product.getCarbohydrates().equals("No Data")) carbohydrates += Double.parseDouble(product.getCarbohydrates());
+                }
+                HSSFRow row = sheet.createRow(0);
+                HSSFCell cell = row.createCell(1);
+                cell.setCellValue("Nuo " + fromDateText.getText().toString() + " d. " + fromTimeText.getText().toString() + " iki " + toDateText.getText().toString() + " d. " + toTimeText.getText().toString());
 
+                row = sheet.createRow(1);
+                cell = row.createCell(0);
+                cell.setCellValue("Suvartotas vanduo (g)");
+                cell = row.createCell(1);
+                Log.d("WATER: ", String.valueOf(water));
+                cell.setCellValue(water);
+
+                row = sheet.createRow(2);
+                cell = row.createCell(0);
+                cell.setCellValue("Suvartotos sausosios medžiagos (g)");
+                cell = row.createCell(1);
+                Log.d("dryMatter: ", String.valueOf(dryMatter));
+                cell.setCellValue(dryMatter);
+
+                row = sheet.createRow(3);
+                cell = row.createCell(0);
+                cell.setCellValue("Suvartoti baltymai (g)");
+                cell = row.createCell(1);
+                Log.d("protein: ", String.valueOf(protein));
+                cell.setCellValue(protein);
+
+                row = sheet.createRow(4);
+                cell = row.createCell(0);
+                cell.setCellValue("Suvartoti riebalai (g)");
+                cell = row.createCell(1);
+                Log.d("fat: ", String.valueOf(fat));
+                cell.setCellValue(fat);
+
+                row = sheet.createRow(5);
+                cell = row.createCell(0);
+                cell.setCellValue("Suvartoti angliavandeniai (g)");
+                cell = row.createCell(1);
+                Log.d("carbohydrates: ", String.valueOf(carbohydrates));
+                cell.setCellValue(carbohydrates);
+
+                sheet.setColumnWidth(0, (30 * 256));
+                sheet.setColumnWidth(1, (60 * 256));
+                downloadExcel(excel);
+            }
+        });
+    }
+    private void setAndProcessValidMealTimeStamps(ReportDataLoadedCallback callback) {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("mealTimeStamps");
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                ArrayList<MealTimeStamp> mealTimeStamps = new ArrayList<>();
+                for (DataSnapshot mealTimeStampSnapshot : dataSnapshot.getChildren()) {
+                    if (isWithinRange(mealTimeStampSnapshot.child("date").getValue(String.class), mealTimeStampSnapshot.child("time").getValue(String.class))) {
+                        ArrayList<String> personalProductsKeys = new ArrayList<>();
+                        ArrayList<String> localProductsKeys = new ArrayList<>();
+                        for (DataSnapshot productKeySnapshot : mealTimeStampSnapshot.child("personalProducts").getChildren()) {
+                            personalProductsKeys.add(productKeySnapshot.getValue(String.class));
+                        }
+                        for (DataSnapshot productKeySnapshot : mealTimeStampSnapshot.child("localProducts").getChildren()) {
+                            localProductsKeys.add(productKeySnapshot.getValue(String.class));
+                        }
+                        mealTimeStamps.add(new MealTimeStamp(
+                                mealTimeStampSnapshot.getKey(),
+                                mealTimeStampSnapshot.child("date").getValue(String.class),
+                                mealTimeStampSnapshot.child("time").getValue(String.class),
+                                personalProductsKeys,
+                                localProductsKeys
+                        ));
+                    }
+                }
+                processMealTimeStamps(mealTimeStamps, callback);
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) { }
+        });
+    }
+    private void processMealTimeStamps(ArrayList<MealTimeStamp> mealTimeStamps, ReportDataLoadedCallback callback) {
+        AtomicInteger operationsCompleted = new AtomicInteger(0);
+        for (MealTimeStamp mealTimeStamp : mealTimeStamps) {
+            processPersonalProducts(mealTimeStamp, new ReportDataLoadedCallback() {
+                @Override
+                public void onCallBack() {
+                    if (operationsCompleted.incrementAndGet() == 2 * mealTimeStamps.size()) callback.onCallBack();
+                }
+            });
+            processLocalProducts(mealTimeStamp, new ReportDataLoadedCallback() {
+                @Override
+                public void onCallBack() {
+                    if (operationsCompleted.incrementAndGet() == 2 * mealTimeStamps.size()) callback.onCallBack();
+                }
+            });
+        }
+    }
+    private void processPersonalProducts(MealTimeStamp mealTimeStamp, ReportDataLoadedCallback callback) {
+        ArrayList<String> personalProductKeys = mealTimeStamp.getPersonalProducts();
+        int totalProductsToLoad = personalProductKeys.size();
+        AtomicInteger productsLoaded = new AtomicInteger(0);
+        DatabaseReference personalProductsRef = FirebaseDatabase.getInstance()
+                .getReference("users")
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .child("products");
+        for (String key : personalProductKeys) {
+            personalProductsRef.child(key).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        Map<String, String> productValues = new HashMap<String, String>();
+                        productValues.put("water", dataSnapshot.child("water").getValue(String.class));
+                        productValues.put("dryMatter", dataSnapshot.child("dryMatter").getValue(String.class));
+                        productValues.put("proteinTotal", dataSnapshot.child("proteinTotal").getValue(String.class));
+                        productValues.put("fatTotal", dataSnapshot.child("fatTotal").getValue(String.class));
+                        productValues.put("carbohydrates", dataSnapshot.child("carbohydrates").getValue(String.class));
+                        personalProducts.add(new Product(productValues));
+                        if (productsLoaded.incrementAndGet() == totalProductsToLoad) callback.onCallBack();
+                    }
+                }
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) { }
+            });
+        }
+    }
+    private void processLocalProducts(MealTimeStamp mealTimeStamp, ReportDataLoadedCallback callback) {
+        ArrayList<String> localProductKeys = mealTimeStamp.getLocalProducts();
+        int totalProductsToLoad = localProductKeys.size();
+        AtomicInteger productsLoaded = new AtomicInteger(0);
+        DatabaseReference localProductsRef = FirebaseDatabase.getInstance().getReference("products");
+        for (String key : localProductKeys) {
+            localProductsRef.child(key).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        Map<String, String> productValues = new HashMap<>();
+                        productValues.put("water", dataSnapshot.child("Water").getValue(String.class));
+                        productValues.put("dryMatter", dataSnapshot.child("Dry matter").getValue(String.class));
+                        productValues.put("proteinTotal", dataSnapshot.child("Protein, total").getValue(String.class));
+                        productValues.put("fatTotal", dataSnapshot.child("Fat, total").getValue(String.class));
+                        productValues.put("carbohydrates", dataSnapshot.child("Carbohydrates").getValue(String.class));
+                        localProducts.add(new Product(productValues));
+                        if (productsLoaded.incrementAndGet() == totalProductsToLoad) callback.onCallBack();
+                    }
+                }
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) { }
+            });
+        }
+    }
+    private boolean isWithinRange(String date, String time) {
+        long mealTimeStampMillis = getMillisFromDateTime(date, time, true);
+        long fromMillis = getMillisFromDateTime(fromDateText.getText().toString(), fromTimeText.getText().toString(), false);
+        long toMillis = getMillisFromDateTime(toDateText.getText().toString(), toTimeText.getText().toString(), false);
+        return mealTimeStampMillis >= fromMillis && mealTimeStampMillis <= toMillis;
+    }
+    private long getMillisFromDateTime(String date, String time, boolean isMealTimeStamp) {
+        String[] fromDate = date.split(" ");
+        int year = Integer.parseInt(fromDate[0]);
+        int month = isMealTimeStamp ? Integer.parseInt(fromDate[1]) : getMonthIndex(fromDate[1]);
+        int day = Integer.parseInt(fromDate[2]);
+        String[] fromTime = time.split(" ");
+        int hour = Integer.parseInt(fromTime[0]);
+        int minutes = Integer.parseInt(isMealTimeStamp ? fromTime[1] : fromTime[2]);
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(year, month, day, hour, minutes, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTimeInMillis();
+    }
     private void downloadExcel(HSSFWorkbook excel) {
         File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "Maitinimosi Dienoraščio Ataskaita_" + System.currentTimeMillis() + ".xls");
         try {
@@ -250,6 +415,7 @@ public class GenerateReportActivity extends AppCompatActivity {
             excel.close();
             showDownloadNotification(file);
             Toast.makeText(this, "Ataskaita sukurta sėkmingai", Toast.LENGTH_SHORT).show();
+            finish();
         } catch (Exception e) {
             Toast.makeText(this, "Nepavyko sukurti ataskaitos", Toast.LENGTH_SHORT).show();
             throw new RuntimeException(e);
@@ -273,11 +439,11 @@ public class GenerateReportActivity extends AppCompatActivity {
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "ExcelDownloadChannel")
-                .setSmallIcon(R.drawable.ic_edit)
-                .setContentTitle("Maitinimosi ataskaita")
-                .setContentText("Ataskaita išsaugota")
-                .setContentIntent(pendingIntent)
-                .setAutoCancel(true);
+            .setSmallIcon(R.drawable.ic_edit)
+            .setContentTitle("Maitinimosi ataskaita")
+            .setContentText("Ataskaita išsaugota")
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true);
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
         notificationManager.notify(1, builder.build());
     }

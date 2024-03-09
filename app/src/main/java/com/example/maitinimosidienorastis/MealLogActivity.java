@@ -32,10 +32,14 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.sql.Array;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class MealLogActivity extends AppCompatActivity implements ProductViewListener{
@@ -218,7 +222,7 @@ public class MealLogActivity extends AppCompatActivity implements ProductViewLis
                         if (savedProducts.get(i).getIsMineNeededToShow()) personalProductsKeys.add(savedProducts.get(i).getKey());
                         else localProductsKeys.add(savedProducts.get(i).getKey());
                     }
-                    MealTimeStamp mealTimeStamp = new MealTimeStamp(dateText.getText().toString(), timeText.getText().toString(), personalProductsKeys, localProductsKeys);
+                    MealTimeStamp mealTimeStamp = new MealTimeStamp(getFormattedDate(), getFormattedTime(), personalProductsKeys, localProductsKeys);
                     ref.push().setValue(mealTimeStamp);
                     Toast.makeText(MealLogActivity.this, "Išsaugota", Toast.LENGTH_SHORT).show();
                     finish();
@@ -267,5 +271,43 @@ public class MealLogActivity extends AppCompatActivity implements ProductViewLis
             }
         };
         getOnBackPressedDispatcher().addCallback(this, callback);
+    }
+    private String getFormattedDate() {
+        String[] parts = dateText.getText().toString().split(" ");
+        return String.format(Locale.getDefault(), "%d %d %d", Integer.parseInt(parts[0]), getMonthIndex(parts[1]), Integer.parseInt(parts[2]));
+    }
+    private int getMonthIndex(String monthName) {
+        switch (monthName) {
+            case "Sausio":
+                return 1;
+            case "Vasario":
+                return 2;
+            case "Kovo":
+                return 3;
+            case "Balandžio":
+                return 4;
+            case "Gegužės":
+                return 5;
+            case "Birželio":
+                return 6;
+            case "Liepos":
+                return 7;
+            case "Rugpjūčio":
+                return 8;
+            case "Rugsėjo":
+                return 9;
+            case "Spalio":
+                return 10;
+            case "Lapkričio":
+                return 11;
+            case "Gruodžio":
+                return 12;
+            default:
+                return 1;
+        }
+    }
+    private String getFormattedTime() {
+        String[] timeParts = timeText.getText().toString().split(" ");
+        return String.format(Locale.getDefault(), "%d %d", Integer.parseInt(timeParts[0]), Integer.parseInt(timeParts[2]));
     }
 }

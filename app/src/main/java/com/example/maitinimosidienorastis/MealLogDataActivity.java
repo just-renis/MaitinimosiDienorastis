@@ -87,8 +87,10 @@ public class MealLogDataActivity extends AppCompatActivity implements MealLogVie
         generateReportButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MealLogDataActivity.this, GenerateReportActivity.class);
-                startActivity(intent);
+                if (!mealTimeStampsList.isEmpty()) {
+                    Intent intent = new Intent(MealLogDataActivity.this, GenerateReportActivity.class);
+                    startActivity(intent);
+                }
             }
         });
     }
