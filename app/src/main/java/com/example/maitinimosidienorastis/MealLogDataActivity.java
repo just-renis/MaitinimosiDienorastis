@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -19,9 +20,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class MealLogDataActivity extends AppCompatActivity implements MealLogViewListener{
 
@@ -45,7 +44,7 @@ public class MealLogDataActivity extends AppCompatActivity implements MealLogVie
         getMealTimeStamps();
     }
     private void getMealTimeStamps() {
-        loadMealTimeStamps(new MealTimeStampsLoadedCallback() {
+        loadMealTimeStamps(new CallbackInterface() {
             @Override
             public void onCallBack() {
                 if (!mealTimeStampsList.isEmpty()) noMealLogsText.setVisibility(View.GONE);
@@ -53,7 +52,7 @@ public class MealLogDataActivity extends AppCompatActivity implements MealLogVie
             }
         });
     }
-    private void loadMealTimeStamps(MealTimeStampsLoadedCallback callback) {
+    private void loadMealTimeStamps(CallbackInterface callback) {
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("mealTimeStamps");
         ref.addValueEventListener(new ValueEventListener() {
             @Override
@@ -91,6 +90,7 @@ public class MealLogDataActivity extends AppCompatActivity implements MealLogVie
                     Intent intent = new Intent(MealLogDataActivity.this, GenerateReportActivity.class);
                     startActivity(intent);
                 }
+                else Toast.makeText(MealLogDataActivity.this, "Neturite jokių mitybos veiklų", Toast.LENGTH_SHORT).show();
             }
         });
     }

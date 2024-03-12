@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
@@ -35,6 +36,10 @@ public class MainActivity extends AppCompatActivity {
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         setContentView(R.layout.activity_main);
         auth = FirebaseAuth.getInstance();
+        if (!auth.getCurrentUser().isEmailVerified()) {
+            Toast.makeText(this, "Patvirtinkite paskyrą el. paštu", Toast.LENGTH_SHORT).show();
+            finish();
+        }
         logOutButton = findViewById(R.id.logOutButton);
         goToMyProductsButton = findViewById(R.id.goToMyProducts);
         goToAddMealLogButton = findViewById(R.id.goToAddMealLogButton);

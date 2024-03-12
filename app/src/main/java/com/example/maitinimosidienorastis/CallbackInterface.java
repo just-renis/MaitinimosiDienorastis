@@ -1,5 +1,5 @@
 package com.example.maitinimosidienorastis;
 
-public interface MealTimeStampsLoadedCallback {
+public interface CallbackInterface {
     void onCallBack();
 }

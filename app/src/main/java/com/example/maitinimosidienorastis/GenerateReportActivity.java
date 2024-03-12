@@ -14,10 +14,11 @@ import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Log;
+import android.util.Pair;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -61,9 +62,13 @@ public class GenerateReportActivity extends AppCompatActivity {
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, PackageManager.PERMISSION_GRANTED);
         setContentView(R.layout.activity_generate_report);
         fromDateText = findViewById(R.id.fromDateText);
+        fromDateText.setPaintFlags(fromDateText.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
         fromTimeText = findViewById(R.id.fromTimeText);
+        fromTimeText.setPaintFlags(fromTimeText.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
         toDateText = findViewById(R.id.toDateText);
+        toDateText.setPaintFlags(toDateText.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
         toTimeText = findViewById(R.id.toTimeText);
+        toTimeText.setPaintFlags(toTimeText.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
         generateReportButton = findViewById(R.id.generateReportButton);
         calendar = Calendar.getInstance();
         setupDate(fromDateText);
@@ -217,15 +222,12 @@ public class GenerateReportActivity extends AppCompatActivity {
     }
 
     private void generateReportAndDownload() {
-        HSSFWorkbook excel = new HSSFWorkbook();
-        HSSFSheet sheet = excel.createSheet("Ataskaitos duomenys");
-        setAndProcessValidMealTimeStamps(new ReportDataLoadedCallback() {
+        setAndProcessValidMealTimeStamps(new CallbackInterface() {
             @Override
             public void onCallBack() {
                 double water = 0, dryMatter = 0, protein = 0, fat = 0, carbohydrates = 0;
                 for (int i = 0; i < localProducts.size(); i++) {
                     Product product = localProducts.get(i);
-                    Log.d("WATER: ", product.getWater() + " " + Double.parseDouble(product.getWater()));
                     if (!product.getWater().equals("No Data")) water += Double.parseDouble(product.getWater());
                     if (!product.getDryMatter().equals("No Data")) dryMatter += Double.parseDouble(product.getDryMatter());
                     if (!product.getProteinTotal().equals("No Data")) protein += Double.parseDouble(product.getProteinTotal());
@@ -234,59 +236,46 @@ public class GenerateReportActivity extends AppCompatActivity {
                 }
                 for (int i = 0; i < personalProducts.size(); i++) {
                     Product product = personalProducts.get(i);
-                    Log.d("WATER: ", product.getWater() + " " + Double.parseDouble(product.getWater()));
                     if (!product.getWater().equals("No Data")) water += Double.parseDouble(product.getWater());
                     if (!product.getDryMatter().equals("No Data")) dryMatter += Double.parseDouble(product.getDryMatter());
                     if (!product.getProteinTotal().equals("No Data")) protein += Double.parseDouble(product.getProteinTotal());
                     if (!product.getFatTotal().equals("No Data")) fat += Double.parseDouble(product.getFatTotal());
                     if (!product.getCarbohydrates().equals("No Data")) carbohydrates += Double.parseDouble(product.getCarbohydrates());
                 }
-                HSSFRow row = sheet.createRow(0);
-                HSSFCell cell = row.createCell(1);
-                cell.setCellValue("Nuo " + fromDateText.getText().toString() + " d. " + fromTimeText.getText().toString() + " iki " + toDateText.getText().toString() + " d. " + toTimeText.getText().toString());
-
-                row = sheet.createRow(1);
-                cell = row.createCell(0);
-                cell.setCellValue("Suvartotas vanduo (g)");
-                cell = row.createCell(1);
-                Log.d("WATER: ", String.valueOf(water));
-                cell.setCellValue(water);
-
-                row = sheet.createRow(2);
-                cell = row.createCell(0);
-                cell.setCellValue("Suvartotos sausosios medžiagos (g)");
-                cell = row.createCell(1);
-                Log.d("dryMatter: ", String.valueOf(dryMatter));
-                cell.setCellValue(dryMatter);
-
-                row = sheet.createRow(3);
-                cell = row.createCell(0);
-                cell.setCellValue("Suvartoti baltymai (g)");
-                cell = row.createCell(1);
-                Log.d("protein: ", String.valueOf(protein));
-                cell.setCellValue(protein);
-
-                row = sheet.createRow(4);
-                cell = row.createCell(0);
-                cell.setCellValue("Suvartoti riebalai (g)");
-                cell = row.createCell(1);
-                Log.d("fat: ", String.valueOf(fat));
-                cell.setCellValue(fat);
-
-                row = sheet.createRow(5);
-                cell = row.createCell(0);
-                cell.setCellValue("Suvartoti angliavandeniai (g)");
-                cell = row.createCell(1);
-                Log.d("carbohydrates: ", String.valueOf(carbohydrates));
-                cell.setCellValue(carbohydrates);
-
-                sheet.setColumnWidth(0, (30 * 256));
-                sheet.setColumnWidth(1, (60 * 256));
-                downloadExcel(excel);
+                downloadExcel(generateExcel(water, dryMatter, protein, fat, carbohydrates));
             }
         });
     }
-    private void setAndProcessValidMealTimeStamps(ReportDataLoadedCallback callback) {
+    private HSSFWorkbook generateExcel(double water, double dryMatter, double protein, double fat, double carbohydrates) {
+        HSSFWorkbook excel = new HSSFWorkbook();
+        HSSFSheet sheet = excel.createSheet("Ataskaitos duomenys");
+        HSSFRow row = sheet.createRow(0);
+        HSSFCell cell = row.createCell(1);
+        cell.setCellValue("Nuo " + fromDateText.getText().toString() + " d. " + fromTimeText.getText().toString() + " iki " + toDateText.getText().toString() + " d. " + toTimeText.getText().toString());
+
+        double totalProducts = localProducts.size() + personalProducts.size();
+        ArrayList<Pair<String, Double>> values = new ArrayList<>();
+        values.add(new Pair<>("Suvartotas vanduo (g)", water));
+        values.add(new Pair<>("Suvartotos sausosios medžiagos (g)", dryMatter));
+        values.add(new Pair<>("Suvartoti baltymai (g)", protein));
+        values.add(new Pair<>("Suvartoti riebalai (g)", fat));
+        values.add(new Pair<>("Suvartoti angliavandeniai (g)", carbohydrates));
+        values.add(new Pair<>("Baltymų vidurkis per produktą (g)", protein / totalProducts));
+        values.add(new Pair<>("Riebalų vidurkis per produktą (g)", fat / totalProducts));
+        values.add(new Pair<>("Angliavandenių vidurkis per produktą (g)", carbohydrates / totalProducts));
+        values.add(new Pair<>("Produktų kiekis", totalProducts));
+        for (int i = 0; i < values.size(); i++) {
+            row = sheet.createRow(i);
+            cell = row.createCell(0);
+            cell.setCellValue(values.get(i).first);
+            cell = row.createCell(1);
+            cell.setCellValue(values.get(i).second);
+        }
+        sheet.setColumnWidth(0, (40 * 256));
+        sheet.setColumnWidth(1, (60 * 256));
+        return excel;
+    }
+    private void setAndProcessValidMealTimeStamps(CallbackInterface callback) {
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("mealTimeStamps");
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -311,22 +300,26 @@ public class GenerateReportActivity extends AppCompatActivity {
                         ));
                     }
                 }
+                if (mealTimeStamps.isEmpty()) {
+                    Toast.makeText(GenerateReportActivity.this, "Nėra jokių mitybos veiklų šiame laiko tarpe", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 processMealTimeStamps(mealTimeStamps, callback);
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) { }
         });
     }
-    private void processMealTimeStamps(ArrayList<MealTimeStamp> mealTimeStamps, ReportDataLoadedCallback callback) {
+    private void processMealTimeStamps(ArrayList<MealTimeStamp> mealTimeStamps, CallbackInterface callback) {
         AtomicInteger operationsCompleted = new AtomicInteger(0);
         for (MealTimeStamp mealTimeStamp : mealTimeStamps) {
-            processPersonalProducts(mealTimeStamp, new ReportDataLoadedCallback() {
+            processPersonalProducts(mealTimeStamp, new CallbackInterface() {
                 @Override
                 public void onCallBack() {
                     if (operationsCompleted.incrementAndGet() == 2 * mealTimeStamps.size()) callback.onCallBack();
                 }
             });
-            processLocalProducts(mealTimeStamp, new ReportDataLoadedCallback() {
+            processLocalProducts(mealTimeStamp, new CallbackInterface() {
                 @Override
                 public void onCallBack() {
                     if (operationsCompleted.incrementAndGet() == 2 * mealTimeStamps.size()) callback.onCallBack();
@@ -334,7 +327,7 @@ public class GenerateReportActivity extends AppCompatActivity {
             });
         }
     }
-    private void processPersonalProducts(MealTimeStamp mealTimeStamp, ReportDataLoadedCallback callback) {
+    private void processPersonalProducts(MealTimeStamp mealTimeStamp, CallbackInterface callback) {
         ArrayList<String> personalProductKeys = mealTimeStamp.getPersonalProducts();
         int totalProductsToLoad = personalProductKeys.size();
         AtomicInteger productsLoaded = new AtomicInteger(0);
@@ -362,7 +355,7 @@ public class GenerateReportActivity extends AppCompatActivity {
             });
         }
     }
-    private void processLocalProducts(MealTimeStamp mealTimeStamp, ReportDataLoadedCallback callback) {
+    private void processLocalProducts(MealTimeStamp mealTimeStamp, CallbackInterface callback) {
         ArrayList<String> localProductKeys = mealTimeStamp.getLocalProducts();
         int totalProductsToLoad = localProductKeys.size();
         AtomicInteger productsLoaded = new AtomicInteger(0);
@@ -439,7 +432,7 @@ public class GenerateReportActivity extends AppCompatActivity {
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "ExcelDownloadChannel")
-            .setSmallIcon(R.drawable.ic_edit)
+            .setSmallIcon(R.drawable.ic_icon)
             .setContentTitle("Maitinimosi ataskaita")
             .setContentText("Ataskaita išsaugota")
             .setContentIntent(pendingIntent)

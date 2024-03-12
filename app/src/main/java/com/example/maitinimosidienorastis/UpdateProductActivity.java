@@ -4,8 +4,10 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.text.InputFilter;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -17,6 +19,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,27 +27,38 @@ public class UpdateProductActivity extends AppCompatActivity {
 
     private Map<String, TextInputEditText> editFieldsMap = new HashMap<>();
     Button updateProductButton;
+    ArrayList<Button> dropdownButtons = new ArrayList<>();
+    ArrayList<LinearLayout> layouts = new ArrayList<>();
+    int whichLayoutIsEnabled = -1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_update_product);
         updateProductButton = findViewById(R.id.updateProductButton);
-        setupEditFieldsMap();
+        setFiltersForInputFields();
         DatabaseReference productsRef = FirebaseDatabase.getInstance().getReference("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("products");
         getDataForProductFieldsFromDB(productsRef);
         setupUpdateProductButton(productsRef);
+        setupDropDownButtons();
     }
-    private void setupEditFieldsMap() {
+    private void setFiltersForInputFields() {
         String[] fieldNames = {
                 "name", "edibleCoefficient", "water", "dryMatter", "proteinTotal", "proteinAnimal",
                 "proteinPlant", "fatTotal", "fattyAcidsTotalSaturated", "fattyAcidsTotalMonounsaturated",
-                "fattyAcidsTotalPolyunsaturated", "cholesterol", "carbohydrates", "starch", "sugars",
-                "fibre", "ashMinerals", "sodium", "magnesium", "phosphorus", "potassium", "calcium",
-                "iron", "zinc", "selenium", "iodide", "vitaminA_RE", "vitaminD", "vitaminE_TE",
-                "thiamin", "riboflavin", "niacin", "niacinEquivalent", "folicAcid", "vitaminB6",
-                "vitaminB12", "vitaminC", "alcohol", "energyValueKJ", "energyValueKCAL"
+                "fattyAcidsTotalPolyunsaturated", "carbohydrates", "starch", "sugars", "fibre", "ashMinerals",
+                "calcium", "iron", "zinc", "thiamin", "riboflavin", "niacin", "folicAcid", "vitaminB6",
+                "alcohol", "cholesterol", "sodium", "magnesium", "phosphorus", "potassium",  "selenium",
+                "iodide", "vitaminA_RE", "vitaminD", "vitaminE_TE", "vitaminB12", "vitaminC",
+                "niacinEquivalent", "energyValueKJ", "energyValueKCAL"
         };
-        for (String fieldName : fieldNames) editFieldsMap.put(fieldName, findViewById(getResources().getIdentifier(fieldName, "id", getPackageName())));
+        for (int i = 0; i < fieldNames.length; i++) {
+            editFieldsMap.put(fieldNames[i], findViewById(getResources().getIdentifier(fieldNames[i], "id", getPackageName())));
+            if (i != 0) {
+                if (i == 1) editFieldsMap.get(fieldNames[i]).setFilters(new InputFilter[]{ new InputFilterMinMax(0.00, 1.0)});
+                else if (i <= 24) editFieldsMap.get(fieldNames[i]).setFilters(new InputFilter[]{ new InputFilterMinMax(0.00, 100.0)});
+                else editFieldsMap.get(fieldNames[i]).setFilters(new InputFilter[]{ new InputFilterMinMax(0.00, 100000.0)});
+            }
+        }
     }
     private void isProductNameExists(ProductNameExistsCallback callback) {
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("products");
@@ -75,7 +89,7 @@ public class UpdateProductActivity extends AppCompatActivity {
                     for (DataSnapshot productSnapshot : dataSnapshot.getChildren()) {
                         Map<String, String> fieldValues = (Map<String, String>) productSnapshot.getValue();
                         for (Map.Entry<String, String> entry : fieldValues.entrySet()) {
-                            editFieldsMap.get(entry.getKey()).setText(entry.getValue().equals("No Data") ? "" : entry.getValue());
+                            if (!entry.getKey().equals("isMineNeededToShow")) editFieldsMap.get(entry.getKey()).setText(entry.getValue().equals("No Data") ? "" : entry.getValue());
                         }
                     }
                 }
@@ -111,5 +125,27 @@ public class UpdateProductActivity extends AppCompatActivity {
                 });
             }
         });
+    }
+    private void setupDropDownButtons() {
+        for (int i = 0; i < 8; i++) {
+            dropdownButtons.add(findViewById(getResources().getIdentifier("dropDownButton" + (i + 1), "id", getPackageName())));
+            dropdownButtons.get(i).setTag(i);
+            layouts.add(findViewById(getResources().getIdentifier("fieldsLayout" + (i + 1), "id", getPackageName())));
+            dropdownButtons.get(i).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int i = (int) v.getTag();
+                    if (layouts.get(i).getVisibility() == View.GONE) {
+                        if (whichLayoutIsEnabled != -1) layouts.get(whichLayoutIsEnabled).setVisibility(View.GONE);
+                        layouts.get(i).setVisibility(View.VISIBLE);
+                        whichLayoutIsEnabled = i;
+                    }
+                    else {
+                        layouts.get(i).setVisibility(View.GONE);
+                        whichLayoutIsEnabled = -1;
+                    }
+                }
+            });
+        }
     }
 }

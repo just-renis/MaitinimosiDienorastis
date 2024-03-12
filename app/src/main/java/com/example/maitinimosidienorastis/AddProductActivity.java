@@ -2,9 +2,11 @@ package com.example.maitinimosidienorastis;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputFilter;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -19,6 +21,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -27,22 +30,14 @@ public class AddProductActivity extends AppCompatActivity {
 
     private Map<String, TextInputEditText> editFieldsMap = new HashMap<>();
     Button addProductButton;
+    ArrayList<Button> dropdownButtons = new ArrayList<>();
+    ArrayList<LinearLayout> layouts = new ArrayList<>();
+    int whichLayoutIsEnabled = -1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_product);
-        String[] fieldNames = {
-                "name", "edibleCoefficient", "water", "dryMatter", "proteinTotal", "proteinAnimal",
-                "proteinPlant", "fatTotal", "fattyAcidsTotalSaturated", "fattyAcidsTotalMonounsaturated",
-                "fattyAcidsTotalPolyunsaturated", "cholesterol", "carbohydrates", "starch", "sugars",
-                "fibre", "ashMinerals", "sodium", "magnesium", "phosphorus", "potassium", "calcium",
-                "iron", "zinc", "selenium", "iodide", "vitaminA_RE", "vitaminD", "vitaminE_TE",
-                "thiamin", "riboflavin", "niacin", "niacinEquivalent", "folicAcid", "vitaminB6",
-                "vitaminB12", "vitaminC", "alcohol", "energyValueKJ", "energyValueKCAL"
-        };
-        for (String fieldName : fieldNames) {
-            editFieldsMap.put(fieldName, findViewById(getResources().getIdentifier(fieldName, "id", getPackageName())));
-        }
+        setFiltersForInputFields();
         addProductButton = findViewById(R.id.addProductButton);
         addProductButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -59,6 +54,26 @@ public class AddProductActivity extends AppCompatActivity {
                 }
             }
         });
+        setupDropDownButtons();
+    }
+    private void setFiltersForInputFields() {
+        String[] fieldNames = {
+                "name", "edibleCoefficient", "water", "dryMatter", "proteinTotal", "proteinAnimal",
+                "proteinPlant", "fatTotal", "fattyAcidsTotalSaturated", "fattyAcidsTotalMonounsaturated",
+                "fattyAcidsTotalPolyunsaturated", "carbohydrates", "starch", "sugars", "fibre", "ashMinerals",
+                "calcium", "iron", "zinc", "thiamin", "riboflavin", "niacin", "folicAcid", "vitaminB6",
+                "alcohol", "cholesterol", "sodium", "magnesium", "phosphorus", "potassium",  "selenium",
+                "iodide", "vitaminA_RE", "vitaminD", "vitaminE_TE", "vitaminB12", "vitaminC",
+                "niacinEquivalent", "energyValueKJ", "energyValueKCAL"
+        };
+        for (int i = 0; i < fieldNames.length; i++) {
+            editFieldsMap.put(fieldNames[i], findViewById(getResources().getIdentifier(fieldNames[i], "id", getPackageName())));
+            if (i != 0) {
+                if (i == 1) editFieldsMap.get(fieldNames[i]).setFilters(new InputFilter[]{ new InputFilterMinMax(0.00, 1.0)});
+                else if (i <= 24) editFieldsMap.get(fieldNames[i]).setFilters(new InputFilter[]{ new InputFilterMinMax(0.00, 100.0)});
+                else editFieldsMap.get(fieldNames[i]).setFilters(new InputFilter[]{ new InputFilterMinMax(0.00, 100000.0)});
+            }
+        }
     }
     private void addProductToDB(FirebaseUser currentUser) {
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("users").child(currentUser.getUid()).child("products");
@@ -101,5 +116,27 @@ public class AddProductActivity extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError error) { callback.onCallBack(false); }
         });
+    }
+    private void setupDropDownButtons() {
+        for (int i = 0; i < 8; i++) {
+            dropdownButtons.add(findViewById(getResources().getIdentifier("dropDownButton" + (i + 1), "id", getPackageName())));
+            dropdownButtons.get(i).setTag(i);
+            layouts.add(findViewById(getResources().getIdentifier("fieldsLayout" + (i + 1), "id", getPackageName())));
+            dropdownButtons.get(i).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int i = (int) v.getTag();
+                    if (layouts.get(i).getVisibility() == View.GONE) {
+                        if (whichLayoutIsEnabled != -1) layouts.get(whichLayoutIsEnabled).setVisibility(View.GONE);
+                        layouts.get(i).setVisibility(View.VISIBLE);
+                        whichLayoutIsEnabled = i;
+                    }
+                    else {
+                        layouts.get(i).setVisibility(View.GONE);
+                        whichLayoutIsEnabled = -1;
+                    }
+                }
+            });
+        }
     }
 }

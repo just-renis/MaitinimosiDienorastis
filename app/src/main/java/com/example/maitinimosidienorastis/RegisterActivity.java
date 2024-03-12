@@ -89,18 +89,27 @@ public class RegisterActivity extends AppCompatActivity {
     }
     private void registerUser(String email, String password) {
         registerProgressBar.setVisibility(View.VISIBLE);
-        auth.createUserWithEmailAndPassword(email, password)
-        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+        auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 registerProgressBar.setVisibility(View.GONE);
                 if (task.isSuccessful()) {
-                    Toast.makeText(RegisterActivity.this, "Paskyra sukurta", Toast.LENGTH_SHORT).show();
+                    sendVerificationEmail();
+                    Toast.makeText(RegisterActivity.this, "Paskyra sukurta, patvirtinkite el. paštu", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
                     startActivity(intent);
                 }
                 else Toast.makeText(RegisterActivity.this, "Nepavyko sukurti paskyros", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+    private void sendVerificationEmail() {
+        FirebaseAuth.getInstance().getCurrentUser().sendEmailVerification()
+            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (!task.isSuccessful()) Toast.makeText(RegisterActivity.this, "Nepavyko išsiųsti patvirtinimo laiško", Toast.LENGTH_SHORT).show();
+                }
+            });
     }
 }

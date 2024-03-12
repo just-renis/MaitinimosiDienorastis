@@ -24,12 +24,12 @@ public class LoginActivity extends AppCompatActivity {
     private Button loginButton;
     private FirebaseAuth auth;
     private ProgressBar loginProgressBar;
-    private TextView clickToRegisterText;
+    private TextView clickToRegisterText, clickToResetPasswordText;
 
     @Override
     public void onStart() {
         super.onStart();
-        if(auth.getCurrentUser() != null){
+        if(auth.getCurrentUser() != null && auth.getCurrentUser().isEmailVerified()){
             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
             startActivity(intent);
         }
@@ -44,8 +44,10 @@ public class LoginActivity extends AppCompatActivity {
         loginButton = findViewById(R.id.loginButton);
         loginProgressBar = findViewById(R.id.registerProgressBar);
         clickToRegisterText = findViewById(R.id.registerNow);
+        clickToResetPasswordText = findViewById(R.id.forgotPassword);
         setupLoginButton();
         setupClickToRegisterText();
+        setupClickToResetPasswordText();
     }
     private void setupLoginButton() {
         loginButton.setOnClickListener(new View.OnClickListener() {
@@ -85,11 +87,33 @@ public class LoginActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<AuthResult> task) {
                 loginProgressBar.setVisibility(View.GONE);
                 if (task.isSuccessful()) {
-                    Toast.makeText(LoginActivity.this, "Sveiki!", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     startActivity(intent);
                 }
                 else Toast.makeText(LoginActivity.this, "Nepavyko prisijungti prie paskyros", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+    private void setupClickToResetPasswordText() {
+        clickToResetPasswordText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String email = editTextEmail.getText().toString().trim();
+                if (TextUtils.isEmpty(email)) {
+                    Toast.makeText(LoginActivity.this, "Įrašykite savo el. pašto adresą", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                FirebaseAuth.getInstance().sendPasswordResetEmail(email)
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                Toast.makeText(LoginActivity.this, "Slaptažodžio keitimas nusiųstas į el. paštą", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(LoginActivity.this, "Nepavyko nusiųsti slaptažodžio keitimo į el. paštą", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
             }
         });
     }

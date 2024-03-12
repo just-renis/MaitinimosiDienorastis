@@ -49,7 +49,7 @@ public class MyProductsActivity extends AppCompatActivity {
         getMyProducts();
     }
     private void getMyProducts() {
-        loadMyProducts(new ProductsLoadedCallback() {
+        loadMyProducts(new CallbackInterface() {
             @Override
             public void onCallBack() {
                 if (!productList.isEmpty()) noProductsText.setVisibility(View.GONE);
@@ -57,7 +57,7 @@ public class MyProductsActivity extends AppCompatActivity {
             }
         });
     }
-    private void loadMyProducts(ProductsLoadedCallback callback) {
+    private void loadMyProducts(CallbackInterface callback) {
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("products");
         ref.addValueEventListener(new ValueEventListener() {
             @Override
