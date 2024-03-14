@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".UpdateProductActivity"
-    android:padding="15dp">
+    tools:context=".AddProductActivity"
+    android:padding="15sp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,12 +13,34 @@
         android:orientation="vertical"
         android:gravity="center">
 
-        <Button
-            android:id="@+id/dropDownButton1"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="start"
-            android:text="Pavadinimas, valgio dalies koeficientas, vanduo, sausosios medžiagos" />
+            android:layout_height="wrap_content">
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/dropDownButton1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start"
+                android:background="@drawable/gradient"
+                android:padding="10sp"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:textAllCaps="false"
+                android:layout_centerVertical="true"
+                android:paddingEnd="30sp"
+                android:layout_marginBottom="10sp"
+                android:text="Pavadinimas, valgio dalies koeficientas, vanduo, sausosios medžiagos" />
+            <ImageView
+                android:id="@+id/leftArrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignEnd="@id/dropDownButton1"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_dropdown_arrow"
+                android:elevation="100sp"
+                android:layout_marginEnd="16dp" />
+        </RelativeLayout>
 
         <LinearLayout
             android:id="@+id/fieldsLayout1"
@@ -75,12 +97,34 @@
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
-        <Button
-            android:id="@+id/dropDownButton2"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="start"
-            android:text="Baltymai" />
+            android:layout_height="wrap_content">
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/dropDownButton2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start"
+                android:background="@drawable/gradient"
+                android:padding="10sp"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:layout_centerVertical="true"
+                android:textAllCaps="false"
+                android:layout_marginBottom="10sp"
+                android:layout_marginTop="10sp"
+                android:text="Baltymai" />
+            <ImageView
+                android:id="@+id/leftArrow2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignEnd="@id/dropDownButton2"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_dropdown_arrow"
+                android:elevation="100sp"
+                android:layout_marginEnd="16dp" />
+        </RelativeLayout>
 
         <LinearLayout
             android:id="@+id/fieldsLayout2"
@@ -126,12 +170,34 @@
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
-        <Button
-            android:id="@+id/dropDownButton3"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="start"
-            android:text="Riebalai" />
+            android:layout_height="wrap_content">
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/dropDownButton3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start"
+                android:background="@drawable/gradient"
+                android:padding="10sp"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:textAllCaps="false"
+                android:layout_centerVertical="true"
+                android:layout_marginBottom="10sp"
+                android:layout_marginTop="10sp"
+                android:text="Riebalai" />
+            <ImageView
+                android:id="@+id/leftArrow3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignEnd="@id/dropDownButton3"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_dropdown_arrow"
+                android:elevation="100sp"
+                android:layout_marginEnd="16dp" />
+        </RelativeLayout>
 
         <LinearLayout
             android:id="@+id/fieldsLayout3"
@@ -189,12 +255,35 @@
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
-        <Button
-            android:id="@+id/dropDownButton4"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="start"
-            android:text="Cholesterolis, angliavandeniai, krakmolas, cukrus" />
+            android:layout_height="wrap_content">
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/dropDownButton4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start"
+                android:background="@drawable/gradient"
+                android:padding="10sp"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:textAllCaps="false"
+                android:paddingEnd="30sp"
+                android:layout_centerVertical="true"
+                android:layout_marginBottom="10sp"
+                android:layout_marginTop="10sp"
+                android:text="Cholesterolis, angliavandeniai, krakmolas, cukrus" />
+            <ImageView
+                android:id="@+id/leftArrow4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignEnd="@id/dropDownButton4"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_dropdown_arrow"
+                android:elevation="100sp"
+                android:layout_marginEnd="16dp" />
+        </RelativeLayout>
 
         <LinearLayout
             android:id="@+id/fieldsLayout4"
@@ -252,12 +341,35 @@
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
-        <Button
-            android:id="@+id/dropDownButton5"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="start"
-            android:text="Skaidulinės ir mineralinės medžiagos, natris, magnis, fosforas" />
+            android:layout_height="wrap_content">
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/dropDownButton5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start"
+                android:background="@drawable/gradient"
+                android:padding="10sp"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:textAllCaps="false"
+                android:layout_marginBottom="10sp"
+                android:paddingEnd="30sp"
+                android:layout_centerVertical="true"
+                android:layout_marginTop="10sp"
+                android:text="Skaidulinės ir mineralinės medžiagos, natris, magnis, fosforas" />
+            <ImageView
+                android:id="@+id/leftArrow5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignEnd="@id/dropDownButton5"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_dropdown_arrow"
+                android:elevation="100sp"
+                android:layout_marginEnd="16dp" />
+        </RelativeLayout>
 
         <LinearLayout
             android:id="@+id/fieldsLayout5"
@@ -327,12 +439,35 @@
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
-        <Button
-            android:id="@+id/dropDownButton6"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="start"
-            android:text="Kalis, kalcis, geležis, cinkas, selenas, jodas, folio rūgštis, alkoholis" />
+            android:layout_height="wrap_content">
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/dropDownButton6"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start"
+                android:background="@drawable/gradient"
+                android:padding="10sp"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:textAllCaps="false"
+                android:paddingEnd="30sp"
+                android:layout_centerVertical="true"
+                android:layout_marginBottom="10sp"
+                android:layout_marginTop="10sp"
+                android:text="Kalis, kalcis, geležis, cinkas, selenas, jodas, folio rūgštis, alkoholis" />
+            <ImageView
+                android:id="@+id/leftArrow6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignEnd="@id/dropDownButton6"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_dropdown_arrow"
+                android:elevation="100sp"
+                android:layout_marginEnd="16dp" />
+        </RelativeLayout>
 
         <LinearLayout
             android:id="@+id/fieldsLayout6"
@@ -438,12 +573,34 @@
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
-        <Button
-            android:id="@+id/dropDownButton7"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="start"
-            android:text="Vitaminai" />
+            android:layout_height="wrap_content">
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/dropDownButton7"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start"
+                android:background="@drawable/gradient"
+                android:padding="10sp"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:textAllCaps="false"
+                android:layout_centerVertical="true"
+                android:layout_marginBottom="10sp"
+                android:layout_marginTop="10sp"
+                android:text="Vitaminai" />
+            <ImageView
+                android:id="@+id/leftArrow7"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignEnd="@id/dropDownButton7"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_dropdown_arrow"
+                android:elevation="100sp"
+                android:layout_marginEnd="16dp" />
+        </RelativeLayout>
 
         <LinearLayout
             android:id="@+id/fieldsLayout7"
@@ -549,12 +706,35 @@
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
-        <Button
-            android:id="@+id/dropDownButton8"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="start"
-            android:text="Niacinas, Niacino ekvivalentas, energinės vertės" />
+            android:layout_height="wrap_content">
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/dropDownButton8"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start"
+                android:background="@drawable/gradient"
+                android:padding="10sp"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:textAllCaps="false"
+                android:paddingEnd="30sp"
+                android:layout_centerVertical="true"
+                android:layout_marginBottom="10sp"
+                android:layout_marginTop="10sp"
+                android:text="Niacinas, Niacino ekvivalentas, energinės vertės" />
+            <ImageView
+                android:id="@+id/leftArrow8"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignEnd="@id/dropDownButton8"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_dropdown_arrow"
+                android:elevation="100sp"
+                android:layout_marginEnd="16dp" />
+        </RelativeLayout>
 
         <LinearLayout
             android:id="@+id/fieldsLayout8"
@@ -612,15 +792,17 @@
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/updateProductButton"
             android:layout_width="match_parent"
-            android:layout_height="70dp"
-            android:layout_marginTop="48dp"
-            android:hint="@string/updateProduct"
-            android:textColorHint="#000"
-            android:textSize="20sp"
+            android:layout_height="70sp"
+            android:layout_marginTop="40sp"
+            android:text="@string/updateProduct"
+            android:background="@drawable/gradient"
+            android:textSize="30sp"
             android:textStyle="bold"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/energyValueKCAL" />

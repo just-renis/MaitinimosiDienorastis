@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    android:padding="15dp"
+    android:padding="15sp"
     tools:context=".RegisterActivity">
 
     <TextView
@@ -14,7 +14,8 @@
         android:textSize="25sp"
         android:textStyle="bold"
         android:gravity="center"
-        android:layout_marginBottom="20dp"
+        android:textColor="@color/black"
+        android:layout_marginBottom="20sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
@@ -57,16 +58,23 @@
         android:visibility="gone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/registerButton"
-        android:text="@string/register"
+        android:text="Registruotis"
+        android:background="@drawable/gradient"
+        android:layout_marginTop="5sp"
+        android:padding="10sp"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:textAllCaps="false"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
     <TextView
         android:textStyle="bold"
         android:textSize="20sp"
         android:gravity="center"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="20sp"
         android:id="@+id/loginNow"
         android:text="@string/click_to_login"
         android:layout_width="wrap_content"

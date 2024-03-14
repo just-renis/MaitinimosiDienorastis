@@ -18,6 +18,7 @@ import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 import android.widget.Button;
@@ -250,7 +251,9 @@ public class GenerateReportActivity extends AppCompatActivity {
         HSSFWorkbook excel = new HSSFWorkbook();
         HSSFSheet sheet = excel.createSheet("Ataskaitos duomenys");
         HSSFRow row = sheet.createRow(0);
-        HSSFCell cell = row.createCell(1);
+        HSSFCell cell = row.createCell(0);
+        cell.setCellValue("100 gramų kiekyje vieno produkto");
+        cell = row.createCell(1);
         cell.setCellValue("Nuo " + fromDateText.getText().toString() + " d. " + fromTimeText.getText().toString() + " iki " + toDateText.getText().toString() + " d. " + toTimeText.getText().toString());
 
         double totalProducts = localProducts.size() + personalProducts.size();
@@ -264,12 +267,12 @@ public class GenerateReportActivity extends AppCompatActivity {
         values.add(new Pair<>("Riebalų vidurkis per produktą (g)", fat / totalProducts));
         values.add(new Pair<>("Angliavandenių vidurkis per produktą (g)", carbohydrates / totalProducts));
         values.add(new Pair<>("Produktų kiekis", totalProducts));
-        for (int i = 0; i < values.size(); i++) {
+        for (int i = 1; i <= values.size(); i++) {
             row = sheet.createRow(i);
             cell = row.createCell(0);
-            cell.setCellValue(values.get(i).first);
+            cell.setCellValue(values.get(i - 1).first);
             cell = row.createCell(1);
-            cell.setCellValue(values.get(i).second);
+            cell.setCellValue(values.get(i - 1).second);
         }
         sheet.setColumnWidth(0, (40 * 256));
         sheet.setColumnWidth(1, (60 * 256));
@@ -330,6 +333,10 @@ public class GenerateReportActivity extends AppCompatActivity {
     private void processPersonalProducts(MealTimeStamp mealTimeStamp, CallbackInterface callback) {
         ArrayList<String> personalProductKeys = mealTimeStamp.getPersonalProducts();
         int totalProductsToLoad = personalProductKeys.size();
+        if (totalProductsToLoad == 0) {
+            callback.onCallBack();
+            return;
+        }
         AtomicInteger productsLoaded = new AtomicInteger(0);
         DatabaseReference personalProductsRef = FirebaseDatabase.getInstance()
                 .getReference("users")
@@ -358,6 +365,10 @@ public class GenerateReportActivity extends AppCompatActivity {
     private void processLocalProducts(MealTimeStamp mealTimeStamp, CallbackInterface callback) {
         ArrayList<String> localProductKeys = mealTimeStamp.getLocalProducts();
         int totalProductsToLoad = localProductKeys.size();
+        if (totalProductsToLoad == 0) {
+            callback.onCallBack();
+            return;
+        }
         AtomicInteger productsLoaded = new AtomicInteger(0);
         DatabaseReference localProductsRef = FirebaseDatabase.getInstance().getReference("products");
         for (String key : localProductKeys) {

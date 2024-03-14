@@ -6,12 +6,25 @@
     android:layout_height="match_parent"
     tools:context=".GenerateReportActivity">
 
+    <ImageView
+        android:id="@+id/transparentImage"
+        android:layout_width="0sp"
+        android:layout_height="0sp"
+        android:alpha="0.5"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_background"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:id="@+id/generateReportTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#CBC3E3"
+        android:background="#AF98F6"
         android:gravity="center"
+        android:textColor="@color/black"
         android:text="Ataskaitos sukūrimas"
         android:textSize="25sp"
         android:textStyle="bold"
@@ -23,11 +36,12 @@
         android:id="@+id/fromDatePlaceholder"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:layout_marginLeft="20dp"
+        android:layout_marginTop="20sp"
+        android:layout_marginLeft="20sp"
         android:text="Nuo:"
         android:textSize="25sp"
         android:textStyle="bold"
+        android:textColor="@color/black"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/generateReportTitle" />
 
@@ -35,7 +49,7 @@
         android:id="@+id/fromDateText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="20sp"
         android:text="Nėra pasirinktos datos"
         android:textColor="#A020F0"
         android:textSize="25sp"
@@ -48,11 +62,12 @@
         android:id="@+id/fromTimePlaceholder"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:layout_marginLeft="20dp"
+        android:layout_marginTop="20sp"
+        android:layout_marginLeft="20sp"
         android:text="Laikas:"
         android:textSize="25sp"
         android:textStyle="bold"
+        android:textColor="@color/black"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/fromDatePlaceholder" />
 
@@ -60,7 +75,7 @@
         android:id="@+id/fromTimeText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="20sp"
         android:text="Nėra pasirinkto laiko"
         android:textColor="#A020F0"
         android:textSize="25sp"
@@ -73,11 +88,12 @@
         android:id="@+id/toDatePlaceholder"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:layout_marginLeft="20dp"
+        android:layout_marginTop="20sp"
+        android:layout_marginLeft="20sp"
         android:text="Iki:"
         android:textSize="25sp"
         android:textStyle="bold"
+        android:textColor="@color/black"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/fromTimePlaceholder" />
 
@@ -85,7 +101,7 @@
         android:id="@+id/toDateText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="20sp"
         android:text="Nėra pasirinktos datos"
         android:textColor="#A020F0"
         android:textSize="25sp"
@@ -98,11 +114,12 @@
         android:id="@+id/toTimePlaceholder"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:layout_marginLeft="20dp"
+        android:layout_marginTop="20sp"
+        android:layout_marginLeft="20sp"
         android:text="Laikas:"
         android:textSize="25sp"
         android:textStyle="bold"
+        android:textColor="@color/black"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toDateText" />
 
@@ -110,7 +127,7 @@
         android:id="@+id/toTimeText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="20sp"
         android:text="Nėra pasirinkto laiko"
         android:textColor="#A020F0"
         android:textSize="25sp"
@@ -119,11 +136,17 @@
         app:layout_constraintStart_toEndOf="@+id/toTimePlaceholder"
         app:layout_constraintTop_toBottomOf="@+id/toDateText" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/generateReportButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Sukurti ataskaitą"
+        android:background="@drawable/gradient"
+        android:padding="10sp"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:textAllCaps="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

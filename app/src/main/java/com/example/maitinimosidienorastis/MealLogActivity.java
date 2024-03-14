@@ -62,7 +62,6 @@ public class MealLogActivity extends AppCompatActivity implements ProductViewLis
         allProductsList = findViewById(R.id.allProductsList);
         allProductsList.setVisibility(View.GONE);
         searchField = findViewById(R.id.searchField);
-        searchField.setVisibility(View.GONE);
         productsProgressBar = findViewById(R.id.productsProgressBar);
         calendar = Calendar.getInstance();
         allProducts = new ArrayList<>();
@@ -158,7 +157,7 @@ public class MealLogActivity extends AppCompatActivity implements ProductViewLis
         productsText.setVisibility(state ? View.VISIBLE : View.GONE);
         productsButton.setVisibility(state ? View.VISIBLE : View.GONE);
         insertButton.setVisibility(state ? View.VISIBLE : View.GONE);
-        StringBuilder savedProductsText = new StringBuilder("1. " + (savedProducts.size() > 0 ? savedProducts.get(0).getName() : ""));
+        StringBuilder savedProductsText = new StringBuilder(savedProducts.size() > 0 ? "1. " + savedProducts.get(0).getName() : "");
         for (int i = 1; i < savedProducts.size(); i++) {
             savedProductsText.append("\n").append((i + 1)).append(". ").append(savedProducts.get(i).getName());
         }

@@ -6,12 +6,25 @@
     android:layout_height="match_parent"
     tools:context=".MealLogDataActivity">
 
+    <ImageView
+        android:id="@+id/transparentImage"
+        android:layout_width="0sp"
+        android:layout_height="0sp"
+        android:alpha="0.5"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_background"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:id="@+id/mealLogDataTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#CBC3E3"
+        android:background="#AF98F6"
         android:gravity="center"
+        android:textColor="@color/black"
         android:text="Mitybos veiklos duomenys"
         android:textSize="25sp"
         android:textStyle="bold"
@@ -28,21 +41,31 @@
         android:textSize="30sp"
         android:textStyle="bold"
         android:gravity="center"
+        android:textColor="@color/black"
         android:text="Neturite jokių mitybos veiklų"
         app:layout_constraintTop_toBottomOf="@+id/mealLogDataTitle" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/mealLogDataList"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="0sp"
         app:layout_constraintTop_toBottomOf="@id/noMealLogsText"
         app:layout_constraintBottom_toTopOf="@+id/generateReportButton"/>
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/generateReportButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Sukurti ataskaitą"
+        android:background="@drawable/gradient"
+        android:layout_marginTop="5sp"
+        android:layout_marginBottom="5sp"
+        android:padding="10sp"
+        android:layout_margin="10sp"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:textAllCaps="false"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

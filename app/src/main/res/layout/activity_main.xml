@@ -6,62 +6,98 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <ImageView
+        android:id="@+id/transparentImage"
+        android:layout_width="0sp"
+        android:layout_height="0sp"
+        android:alpha="0.5"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_background"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:id="@+id/mainViewTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#CBC3E3"
+        android:background="#AF98F6"
         android:gravity="center"
         android:text="Pagrindinis"
         android:textSize="25sp"
         android:textStyle="bold"
+        android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/logOutButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="40sp"
         android:text="Atsijungti"
-        android:layout_marginEnd="20dp"
+        android:background="@drawable/gradient"
+        android:padding="10sp"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:layout_marginEnd="20sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"/>
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/goToMyProducts"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="80dp"
-        android:layout_marginTop="100dp"
-        android:layout_marginEnd="80dp"
+        android:layout_marginStart="80sp"
+        android:layout_marginTop="100sp"
+        android:layout_marginEnd="80sp"
+        android:background="@drawable/gradient"
+        android:padding="10sp"
         android:gravity="center"
         android:text="Eiti į mano produktų sąrašą"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:textAllCaps="false"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/goToAddMealLogButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="80dp"
-        android:layout_marginTop="30dp"
-        android:layout_marginEnd="80dp"
+        android:layout_marginStart="80sp"
+        android:layout_marginTop="30sp"
+        android:layout_marginEnd="80sp"
+        android:background="@drawable/gradient"
+        android:padding="10sp"
         android:gravity="center"
         android:text="Eiti į mitybos veiklos nustatymą"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:textAllCaps="false"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/goToMyProducts" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/goToInspectMealLogDataButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="30sp"
+        android:background="@drawable/gradient"
+        android:padding="10sp"
         android:gravity="center"
         android:text="Eiti į mitybos veiklos duomenų atvaizdavimą"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:textAllCaps="false"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/goToAddMealLogButton"/>
