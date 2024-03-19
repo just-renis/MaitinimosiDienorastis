@@ -42,6 +42,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import android.Manifest;
 
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -226,28 +227,66 @@ public class GenerateReportActivity extends AppCompatActivity {
         setAndProcessValidMealTimeStamps(new CallbackInterface() {
             @Override
             public void onCallBack() {
-                double water = 0, dryMatter = 0, protein = 0, fat = 0, carbohydrates = 0;
-                for (int i = 0; i < localProducts.size(); i++) {
-                    Product product = localProducts.get(i);
-                    if (!product.getWater().equals("No Data")) water += Double.parseDouble(product.getWater());
-                    if (!product.getDryMatter().equals("No Data")) dryMatter += Double.parseDouble(product.getDryMatter());
-                    if (!product.getProteinTotal().equals("No Data")) protein += Double.parseDouble(product.getProteinTotal());
-                    if (!product.getFatTotal().equals("No Data")) fat += Double.parseDouble(product.getFatTotal());
-                    if (!product.getCarbohydrates().equals("No Data")) carbohydrates += Double.parseDouble(product.getCarbohydrates());
-                }
-                for (int i = 0; i < personalProducts.size(); i++) {
-                    Product product = personalProducts.get(i);
-                    if (!product.getWater().equals("No Data")) water += Double.parseDouble(product.getWater());
-                    if (!product.getDryMatter().equals("No Data")) dryMatter += Double.parseDouble(product.getDryMatter());
-                    if (!product.getProteinTotal().equals("No Data")) protein += Double.parseDouble(product.getProteinTotal());
-                    if (!product.getFatTotal().equals("No Data")) fat += Double.parseDouble(product.getFatTotal());
-                    if (!product.getCarbohydrates().equals("No Data")) carbohydrates += Double.parseDouble(product.getCarbohydrates());
-                }
-                downloadExcel(generateExcel(water, dryMatter, protein, fat, carbohydrates));
+                Map<String, Double> fields = new HashMap<>();
+                String[] fieldNames = {
+                        "edibleCoefficient", "water", "dryMatter", "proteinTotal", "proteinAnimal",
+                        "proteinPlant", "fatTotal", "fattyAcidsTotalSaturated", "fattyAcidsTotalMonounsaturated",
+                        "fattyAcidsTotalPolyunsaturated", "carbohydrates", "starch", "sugars", "fibre", "ashMinerals",
+                        "calcium", "iron", "zinc", "thiamin", "riboflavin", "niacin", "folicAcid", "vitaminB6",
+                        "alcohol", "cholesterol", "sodium", "magnesium", "phosphorus", "potassium",  "selenium",
+                        "iodide", "vitaminA_RE", "vitaminD", "vitaminE_TE", "vitaminB12", "vitaminC",
+                        "niacinEquivalent", "energyValueKJ", "energyValueKCAL"
+                };
+                for (String fieldName : fieldNames) fields.put(fieldName, (double) 0);
+                for (int i = 0; i < localProducts.size(); i++) extractProductValues(localProducts.get(i), fields);
+                for (int i = 0; i < personalProducts.size(); i++) extractProductValues(personalProducts.get(i), fields);
+                downloadExcel(generateExcel(fields));
             }
         });
     }
-    private HSSFWorkbook generateExcel(double water, double dryMatter, double protein, double fat, double carbohydrates) {
+    private void extractProductValues(Product product, Map<String, Double> fields) {
+        if (!product.getWater().equals("No Data")) fields.put("water", fields.get("water") + Double.parseDouble(product.getWater()));
+        if (!product.getDryMatter().equals("No Data")) fields.put("water", fields.get("dryMatter") + Double.parseDouble(product.getDryMatter()));
+        if (!product.getProteinTotal().equals("No Data")) fields.put("proteinTotal", fields.get("proteinTotal") + Double.parseDouble(product.getProteinTotal()));
+        if (!product.getFatTotal().equals("No Data")) fields.put("fatTotal", fields.get("fatTotal") + Double.parseDouble(product.getFatTotal()));
+        if (!product.getCarbohydrates().equals("No Data")) fields.put("carbohydrates", fields.get("carbohydrates") + Double.parseDouble(product.getCarbohydrates()));
+        if (!product.getEdibleCoefficient().equals("No Data")) fields.put("edibleCoefficient", fields.get("edibleCoefficient") + Double.parseDouble(product.getEdibleCoefficient()));
+        if (!product.getProteinAnimal().equals("No Data")) fields.put("proteinAnimal", fields.get("proteinAnimal") + Double.parseDouble(product.getProteinAnimal()));
+        if (!product.getProteinPlant().equals("No Data")) fields.put("proteinPlant", fields.get("proteinPlant") + Double.parseDouble(product.getProteinPlant()));
+        if (!product.getFattyAcidsTotalSaturated().equals("No Data")) fields.put("fattyAcidsTotalSaturated", fields.get("fattyAcidsTotalSaturated") + Double.parseDouble(product.getFattyAcidsTotalSaturated()));
+        if (!product.getFattyAcidsTotalMonounsaturated().equals("No Data")) fields.put("fattyAcidsTotalMonounsaturated", fields.get("fattyAcidsTotalMonounsaturated") + Double.parseDouble(product.getFattyAcidsTotalMonounsaturated()));
+        if (!product.getFattyAcidsTotalPolyunsaturated().equals("No Data")) fields.put("fattyAcidsTotalPolyunsaturated", fields.get("fattyAcidsTotalPolyunsaturated") + Double.parseDouble(product.getFattyAcidsTotalPolyunsaturated()));
+        if (!product.getStarch().equals("No Data")) fields.put("starch", fields.get("starch") + Double.parseDouble(product.getStarch()));
+        if (!product.getSugars().equals("No Data")) fields.put("sugars", fields.get("sugars") + Double.parseDouble(product.getSugars()));
+        if (!product.getFibre().equals("No Data")) fields.put("fibre", fields.get("fibre") + Double.parseDouble(product.getFibre()));
+        if (!product.getAshMinerals().equals("No Data")) fields.put("ashMinerals", fields.get("ashMinerals") + Double.parseDouble(product.getAshMinerals()));
+        if (!product.getCalcium().equals("No Data")) fields.put("calcium", fields.get("calcium") + Double.parseDouble(product.getCalcium()));
+        if (!product.getIron().equals("No Data")) fields.put("iron", fields.get("iron") + Double.parseDouble(product.getIron()));
+        if (!product.getZinc().equals("No Data")) fields.put("zinc", fields.get("zinc") + Double.parseDouble(product.getZinc()));
+        if (!product.getThiamin().equals("No Data")) fields.put("thiamin", fields.get("thiamin") + Double.parseDouble(product.getThiamin()));
+        if (!product.getRiboflavin().equals("No Data")) fields.put("riboflavin", fields.get("riboflavin") + Double.parseDouble(product.getRiboflavin()));
+        if (!product.getNiacin().equals("No Data")) fields.put("niacin", fields.get("niacin") + Double.parseDouble(product.getNiacin()));
+        if (!product.getFolicAcid().equals("No Data")) fields.put("folicAcid", fields.get("folicAcid") + Double.parseDouble(product.getFolicAcid()));
+        if (!product.getVitaminB6().equals("No Data")) fields.put("vitaminB6", fields.get("vitaminB6") + Double.parseDouble(product.getVitaminB6()));
+        if (!product.getAlcohol().equals("No Data")) fields.put("alcohol", fields.get("alcohol") + Double.parseDouble(product.getAlcohol()));
+        if (!product.getCholesterol().equals("No Data")) fields.put("cholesterol", fields.get("cholesterol") + Double.parseDouble(product.getCholesterol()));
+        if (!product.getSodium().equals("No Data")) fields.put("sodium", fields.get("sodium") + Double.parseDouble(product.getSodium()));
+        if (!product.getMagnesium().equals("No Data")) fields.put("magnesium", fields.get("magnesium") + Double.parseDouble(product.getMagnesium()));
+        if (!product.getPhosphorus().equals("No Data")) fields.put("phosphorus", fields.get("phosphorus") + Double.parseDouble(product.getPhosphorus()));
+        if (!product.getPotassium().equals("No Data")) fields.put("potassium", fields.get("potassium") + Double.parseDouble(product.getPotassium()));
+        if (!product.getSelenium().equals("No Data")) fields.put("selenium", fields.get("selenium") + Double.parseDouble(product.getSelenium()));
+        if (!product.getIodide().equals("No Data")) fields.put("iodide", fields.get("iodide") + Double.parseDouble(product.getIodide()));
+        if (!product.getVitaminA_RE().equals("No Data")) fields.put("vitaminA_RE", fields.get("vitaminA_RE") + Double.parseDouble(product.getVitaminA_RE()));
+        if (!product.getVitaminD().equals("No Data")) fields.put("vitaminD", fields.get("vitaminD") + Double.parseDouble(product.getVitaminD()));
+        if (!product.getVitaminE_TE().equals("No Data")) fields.put("vitaminE_TE", fields.get("vitaminE_TE") + Double.parseDouble(product.getVitaminE_TE()));
+        if (!product.getVitaminB12().equals("No Data")) fields.put("vitaminB12", fields.get("vitaminB12") + Double.parseDouble(product.getVitaminB12()));
+        if (!product.getVitaminC().equals("No Data")) fields.put("vitaminC", fields.get("vitaminC") + Double.parseDouble(product.getVitaminC()));
+        if (!product.getNiacinEquivalent().equals("No Data")) fields.put("niacinEquivalent", fields.get("niacinEquivalent") + Double.parseDouble(product.getNiacinEquivalent()));
+        if (!product.getEnergyValueKJ().equals("No Data")) fields.put("energyValueKJ", fields.get("energyValueKJ") + Double.parseDouble(product.getEnergyValueKJ()));
+        if (!product.getEnergyValueKCAL().equals("No Data")) fields.put("energyValueKCAL", fields.get("energyValueKCAL") + Double.parseDouble(product.getEnergyValueKCAL()));
+
+    }
+    private HSSFWorkbook generateExcel(Map<String, Double> fields) {
         HSSFWorkbook excel = new HSSFWorkbook();
         HSSFSheet sheet = excel.createSheet("Ataskaitos duomenys");
         HSSFRow row = sheet.createRow(0);
@@ -258,14 +297,48 @@ public class GenerateReportActivity extends AppCompatActivity {
 
         double totalProducts = localProducts.size() + personalProducts.size();
         ArrayList<Pair<String, Double>> values = new ArrayList<>();
-        values.add(new Pair<>("Suvartotas vanduo (g)", water));
-        values.add(new Pair<>("Suvartotos sausosios medžiagos (g)", dryMatter));
-        values.add(new Pair<>("Suvartoti baltymai (g)", protein));
-        values.add(new Pair<>("Suvartoti riebalai (g)", fat));
-        values.add(new Pair<>("Suvartoti angliavandeniai (g)", carbohydrates));
-        values.add(new Pair<>("Baltymų vidurkis per produktą (g)", protein / totalProducts));
-        values.add(new Pair<>("Riebalų vidurkis per produktą (g)", fat / totalProducts));
-        values.add(new Pair<>("Angliavandenių vidurkis per produktą (g)", carbohydrates / totalProducts));
+        values.add(new Pair<>("Valgio dalies koeficientas", fields.get("edibleCoefficient") / totalProducts));
+        values.add(new Pair<>("Suvartotas vanduo (g)", fields.get("water")));
+        values.add(new Pair<>("Suvartotos sausosios medžiagos (g)", fields.get("dryMatter")));
+        values.add(new Pair<>("Suvartoti baltymai (g)", fields.get("proteinTotal")));
+        values.add(new Pair<>("Suvartoti gyvūniniai baltymai (g)", fields.get("proteinAnimal")));
+        values.add(new Pair<>("Suvartoti augaliniai baltymai (g)", fields.get("proteinPlant")));
+        values.add(new Pair<>("Baltymų vidurkis per produktą (g)", fields.get("proteinTotal") / totalProducts));
+        values.add(new Pair<>("Suvartoti riebalai (g)", fields.get("fatTotal")));
+        values.add(new Pair<>("Suvartotos sočiosios riebalų rūgštys (g)", fields.get("fattyAcidsTotalSaturated")));
+        values.add(new Pair<>("Suvartotos mononesočiosios riebalų rūgštys (g)", fields.get("fattyAcidsTotalMonounsaturated")));
+        values.add(new Pair<>("Suvartotos polinesočiosios riebalų rūgštys (g)", fields.get("fattyAcidsTotalPolyunsaturated")));
+        values.add(new Pair<>("Riebalų vidurkis per produktą (g)", fields.get("fatTotal") / totalProducts));
+        values.add(new Pair<>("Suvartoti angliavandeniai (g)", fields.get("carbohydrates")));
+        values.add(new Pair<>("Angliavandenių vidurkis per produktą (g)", fields.get("carbohydrates") / totalProducts));
+        values.add(new Pair<>("Suvartotas cholesterolis (mg)", fields.get("cholesterol")));
+        values.add(new Pair<>("Suvartotas krakmolas (g)", fields.get("starch")));
+        values.add(new Pair<>("Suvartotas cukrus (g)", fields.get("sugars")));
+        values.add(new Pair<>("Suvartotos skaidulinės medžiagos (g)", fields.get("fibre")));
+        values.add(new Pair<>("Suvartotos mineralinės medžiagos (g)", fields.get("ashMinerals")));
+        values.add(new Pair<>("Suvartotas natris (mg)", fields.get("sodium")));
+        values.add(new Pair<>("Suvartotas magnis (mg)", fields.get("magnesium")));
+        values.add(new Pair<>("Suvartotas fosforas (mg)", fields.get("phosphorus")));
+        values.add(new Pair<>("Suvartotas kalis (mg)", fields.get("potassium")));
+        values.add(new Pair<>("Suvartotas kalcis (g)", fields.get("calcium")));
+        values.add(new Pair<>("Suvartota geležies (g)", fields.get("iron")));
+        values.add(new Pair<>("Suvartotas cinkas (g)", fields.get("zinc")));
+        values.add(new Pair<>("Suvartotas selenas (mg)", fields.get("selenium")));
+        values.add(new Pair<>("Suvartotas jodas (mg)", fields.get("iodide")));
+        values.add(new Pair<>("Suvartota folio rūgšties (g)", fields.get("folicAcid")));
+        values.add(new Pair<>("Suvartotas alkoholis (g)", fields.get("alcohol")));
+        values.add(new Pair<>("Suvartotas vitaminas A (mg)", fields.get("vitaminA_RE")));
+        values.add(new Pair<>("Suvartotas vitaminas D (mg)", fields.get("vitaminD")));
+        values.add(new Pair<>("Suvartotas vitaminas E (mg)", fields.get("vitaminE_TE")));
+        values.add(new Pair<>("Suvartotas vitaminas B1 (g)", fields.get("thiamin")));
+        values.add(new Pair<>("Suvartotas vitaminas B2 (g)", fields.get("riboflavin")));
+        values.add(new Pair<>("Suvartotas vitaminas B6 (g)", fields.get("vitaminB6")));
+        values.add(new Pair<>("Suvartotas vitaminas B12 (mg)", fields.get("vitaminB12")));
+        values.add(new Pair<>("Suvartotas vitaminas C (mg)", fields.get("vitaminC")));
+        values.add(new Pair<>("Suvartotas niacinas (g)", fields.get("niacin")));
+        values.add(new Pair<>("Suvartotas niacino ekvivalentas (mg)", fields.get("niacinEquivalent")));
+        values.add(new Pair<>("Suvartota energinė vertė (kj)", fields.get("energyValueKJ")));
+        values.add(new Pair<>("Suvartota energinė vertė (kcal)", fields.get("energyValueKCAL")));
         values.add(new Pair<>("Produktų kiekis", totalProducts));
         for (int i = 1; i <= values.size(); i++) {
             row = sheet.createRow(i);
@@ -274,7 +347,7 @@ public class GenerateReportActivity extends AppCompatActivity {
             cell = row.createCell(1);
             cell.setCellValue(values.get(i - 1).second);
         }
-        sheet.setColumnWidth(0, (40 * 256));
+        sheet.setColumnWidth(0, (50 * 256));
         sheet.setColumnWidth(1, (60 * 256));
         return excel;
     }
@@ -353,6 +426,40 @@ public class GenerateReportActivity extends AppCompatActivity {
                         productValues.put("proteinTotal", dataSnapshot.child("proteinTotal").getValue(String.class));
                         productValues.put("fatTotal", dataSnapshot.child("fatTotal").getValue(String.class));
                         productValues.put("carbohydrates", dataSnapshot.child("carbohydrates").getValue(String.class));
+                        productValues.put("alcohol", dataSnapshot.child("alcohol").getValue(String.class));
+                        productValues.put("ashMinerals", dataSnapshot.child("ashMinerals").getValue(String.class));
+                        productValues.put("calcium", dataSnapshot.child("calcium").getValue(String.class));
+                        productValues.put("cholesterol", dataSnapshot.child("cholesterol").getValue(String.class));
+                        productValues.put("edibleCoefficient", dataSnapshot.child("edibleCoefficient").getValue(String.class));
+                        productValues.put("energyValueKCAL", dataSnapshot.child("energyValueKCAL").getValue(String.class));
+                        productValues.put("energyValueKJ", dataSnapshot.child("energyValueKJ").getValue(String.class));
+                        productValues.put("fattyAcidsTotalMonounsaturated", dataSnapshot.child("fattyAcidsTotalMonounsaturated").getValue(String.class));
+                        productValues.put("fattyAcidsTotalPolyunsaturated", dataSnapshot.child("fattyAcidsTotalPolyunsaturated").getValue(String.class));
+                        productValues.put("fattyAcidsTotalSaturated", dataSnapshot.child("fattyAcidsTotalSaturated").getValue(String.class));
+                        productValues.put("fibre", dataSnapshot.child("fibre").getValue(String.class));
+                        productValues.put("folicAcid", dataSnapshot.child("folicAcid").getValue(String.class));
+                        productValues.put("iodide", dataSnapshot.child("iodide").getValue(String.class));
+                        productValues.put("iron", dataSnapshot.child("iron").getValue(String.class));
+                        productValues.put("magnesium", dataSnapshot.child("magnesium").getValue(String.class));
+                        productValues.put("niacin", dataSnapshot.child("niacin").getValue(String.class));
+                        productValues.put("niacinEquivalent", dataSnapshot.child("niacinEquivalent").getValue(String.class));
+                        productValues.put("phosphorus", dataSnapshot.child("phosphorus").getValue(String.class));
+                        productValues.put("potassium", dataSnapshot.child("potassium").getValue(String.class));
+                        productValues.put("proteinAnimal", dataSnapshot.child("proteinAnimal").getValue(String.class));
+                        productValues.put("proteinPlant", dataSnapshot.child("proteinPlant").getValue(String.class));
+                        productValues.put("riboflavin", dataSnapshot.child("riboflavin").getValue(String.class));
+                        productValues.put("selenium", dataSnapshot.child("selenium").getValue(String.class));
+                        productValues.put("sodium", dataSnapshot.child("sodium").getValue(String.class));
+                        productValues.put("starch", dataSnapshot.child("starch").getValue(String.class));
+                        productValues.put("sugars", dataSnapshot.child("sugars").getValue(String.class));
+                        productValues.put("thiamin", dataSnapshot.child("thiamin").getValue(String.class));
+                        productValues.put("vitaminA_RE", dataSnapshot.child("vitaminA_RE").getValue(String.class));
+                        productValues.put("vitaminB12", dataSnapshot.child("vitaminB12").getValue(String.class));
+                        productValues.put("vitaminB6", dataSnapshot.child("vitaminB6").getValue(String.class));
+                        productValues.put("vitaminC", dataSnapshot.child("vitaminC").getValue(String.class));
+                        productValues.put("vitaminD", dataSnapshot.child("vitaminD").getValue(String.class));
+                        productValues.put("vitaminE_TE", dataSnapshot.child("vitaminE_TE").getValue(String.class));
+                        productValues.put("zinc", dataSnapshot.child("zinc").getValue(String.class));
                         personalProducts.add(new Product(productValues));
                         if (productsLoaded.incrementAndGet() == totalProductsToLoad) callback.onCallBack();
                     }
@@ -382,6 +489,40 @@ public class GenerateReportActivity extends AppCompatActivity {
                         productValues.put("proteinTotal", dataSnapshot.child("Protein, total").getValue(String.class));
                         productValues.put("fatTotal", dataSnapshot.child("Fat, total").getValue(String.class));
                         productValues.put("carbohydrates", dataSnapshot.child("Carbohydrates").getValue(String.class));
+                        productValues.put("alcohol", dataSnapshot.child("Alcohol").getValue(String.class));
+                        productValues.put("ashMinerals", dataSnapshot.child("Ash (minerals)").getValue(String.class));
+                        productValues.put("calcium", dataSnapshot.child("Calcium").getValue(String.class));
+                        productValues.put("cholesterol", dataSnapshot.child("Cholesterol").getValue(String.class));
+                        productValues.put("edibleCoefficient", dataSnapshot.child("Edible part").getValue(String.class));
+                        productValues.put("energyValueKCAL", dataSnapshot.child("Energy value, kcal").getValue(String.class));
+                        productValues.put("energyValueKJ", dataSnapshot.child("Energy value, kJ").getValue(String.class));
+                        productValues.put("fattyAcidsTotalMonounsaturated", dataSnapshot.child("Fatty acids, total monounsaturated").getValue(String.class));
+                        productValues.put("fattyAcidsTotalPolyunsaturated", dataSnapshot.child("Fatty acids, total polyunsaturated").getValue(String.class));
+                        productValues.put("fattyAcidsTotalSaturated", dataSnapshot.child("Fatty acids, total saturated").getValue(String.class));
+                        productValues.put("fibre", dataSnapshot.child("Fibre").getValue(String.class));
+                        productValues.put("folicAcid", dataSnapshot.child("Folic acid").getValue(String.class));
+                        productValues.put("iodide", dataSnapshot.child("Iodide").getValue(String.class));
+                        productValues.put("iron", dataSnapshot.child("Iron").getValue(String.class));
+                        productValues.put("magnesium", dataSnapshot.child("Magnesium").getValue(String.class));
+                        productValues.put("niacin", dataSnapshot.child("Niacin").getValue(String.class));
+                        productValues.put("niacinEquivalent", dataSnapshot.child("Niacin equivalent").getValue(String.class));
+                        productValues.put("phosphorus", dataSnapshot.child("Phosphorus").getValue(String.class));
+                        productValues.put("potassium", dataSnapshot.child("Potassium").getValue(String.class));
+                        productValues.put("proteinAnimal", dataSnapshot.child("Protein, animal").getValue(String.class));
+                        productValues.put("proteinPlant", dataSnapshot.child("Protein, plant").getValue(String.class));
+                        productValues.put("riboflavin", dataSnapshot.child("Vitamin B2").getValue(String.class));
+                        productValues.put("selenium", dataSnapshot.child("Selenium").getValue(String.class));
+                        productValues.put("sodium", dataSnapshot.child("Sodium").getValue(String.class));
+                        productValues.put("starch", dataSnapshot.child("Starch").getValue(String.class));
+                        productValues.put("sugars", dataSnapshot.child("Sugars").getValue(String.class));
+                        productValues.put("thiamin", dataSnapshot.child("Vitamin B1").getValue(String.class));
+                        productValues.put("vitaminA_RE", dataSnapshot.child("Vitamin A (RE)").getValue(String.class));
+                        productValues.put("vitaminB12", dataSnapshot.child("Vitamin B12").getValue(String.class));
+                        productValues.put("vitaminB6", dataSnapshot.child("Vitamin B6").getValue(String.class));
+                        productValues.put("vitaminC", dataSnapshot.child("Vitamin C").getValue(String.class));
+                        productValues.put("vitaminD", dataSnapshot.child("Vitamin D").getValue(String.class));
+                        productValues.put("vitaminE_TE", dataSnapshot.child("Vitamin E (TE)").getValue(String.class));
+                        productValues.put("zinc", dataSnapshot.child("Zinc").getValue(String.class));
                         localProducts.add(new Product(productValues));
                         if (productsLoaded.incrementAndGet() == totalProductsToLoad) callback.onCallBack();
                     }

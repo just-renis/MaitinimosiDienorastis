@@ -9,7 +9,6 @@ public class MyApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Toast.makeText(this, "PERSISTENCE ENABLED", Toast.LENGTH_SHORT).show();
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
     }
 }
