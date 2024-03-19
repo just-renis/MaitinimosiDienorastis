@@ -347,7 +347,7 @@ public class GenerateReportActivity extends AppCompatActivity {
             cell = row.createCell(1);
             cell.setCellValue(values.get(i - 1).second);
         }
-        sheet.setColumnWidth(0, (50 * 256));
+        sheet.setColumnWidth(0, (43 * 256));
         sheet.setColumnWidth(1, (60 * 256));
         return excel;
     }
